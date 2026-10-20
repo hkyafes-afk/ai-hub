@@ -29,8 +29,8 @@
   header{
     position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;
     padding:calc(12px + env(safe-area-inset-top)) 16px 12px;
-    background:linear-gradient(95deg,#ff2d95 0%,#c026d3 55%,#7c3aed 100%);
-    box-shadow:0 8px 30px -8px rgba(255,45,149,.55);
+    background:#0c0919;
+    border-bottom:1px solid var(--line);
     z-index:2;
   }
   .brand{display:flex;align-items:center;gap:10px}
@@ -38,7 +38,7 @@
     width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
     background:rgba(0,0,0,.28);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);font-size:18px;
   }
-  .brand h1{font-size:17px;letter-spacing:2px;font-weight:800;text-shadow:0 0 14px rgba(255,255,255,.35)}
+  .brand h1{font-size:16px;letter-spacing:2.5px;font-weight:700}
   .brand small{display:block;font-size:10px;letter-spacing:1.5px;opacity:.8;font-weight:500}
   .hright{display:flex;align-items:center;gap:8px}
   .clock{font-variant-numeric:tabular-nums;font-size:12px;opacity:.9;background:rgba(0,0,0,.25);padding:5px 9px;border-radius:999px}
@@ -213,7 +213,7 @@
 <header>
   <div class="brand">
     <div class="logo">✦</div>
-    <div><h1>AI HUB</h1><small>ÇOKLU AJAN · ÜCRETSİZ KATMAN</small></div>
+    <div><h1>AI HUB</h1></div>
   </div>
   <div class="hright">
     <span class="clock" id="clock">--:--</span>
