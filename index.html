@@ -20,17 +20,18 @@
   --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-tap-highlight-color:transparent}
 body{overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 a{color:#7dd3fc}
 .ic{width:20px;height:20px;flex:none}
 
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:880px;margin:0 auto;
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:920px;margin:0 auto;
   background:radial-gradient(110% 45% at 50% -5%,rgba(139,92,246,.16),transparent 60%),radial-gradient(80% 40% at 100% 100%,rgba(255,61,154,.06),transparent 60%)}
 
 /* ---------- üst bar ---------- */
-.top{flex:none;display:flex;align-items:center;gap:4px;padding:calc(8px + env(safe-area-inset-top)) 8px 8px}
+.top{flex:none;display:flex;align-items:center;gap:4px;padding:calc(6px + env(safe-area-inset-top)) 8px 6px}
 .icon-btn{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;color:var(--dim);transition:background .15s,color .15s}
 .icon-btn:hover,.icon-btn:active{background:var(--raise);color:var(--text)}
 .icon-btn.sm{width:32px;height:32px;border-radius:10px}
@@ -42,12 +43,14 @@ a{color:#7dd3fc}
 .title-text small{display:block;font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---------- canlı ekran ---------- */
-.stage{flex:none;margin:2px 12px 0;border-radius:18px;border:1px solid var(--line);background:var(--panel);overflow:hidden;
-  box-shadow:0 18px 40px -26px rgba(139,92,246,.6)}
-.stage-head{display:flex;align-items:center;gap:8px;height:38px;padding:0 4px 0 12px}
-.stage:not(.collapsed) .stage-head{border-bottom:1px solid var(--line)}
-.sts{flex:1;min-width:0;display:flex;gap:14px;overflow-x:auto;scrollbar-width:none}
+.stage{flex:none;display:flex;flex-direction:column;background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stage-head{flex:none;display:flex;align-items:center;gap:6px;height:44px;padding:0 6px 0 10px}
+.tabs{display:flex;gap:2px;padding:3px;border-radius:11px;background:#0a0818;border:1px solid var(--line)}
+.tab{height:28px;padding:0 11px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--faint);transition:background .15s,color .15s}
+.tab.on{background:var(--raise);color:var(--text)}
+.sts{flex:1;min-width:0;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none}
 .sts::-webkit-scrollbar{display:none}
+.stage.collapsed .tabs{display:none}
 .st{display:flex;align-items:center;gap:6px;font-size:12px;white-space:nowrap;color:var(--dim)}
 .st b{font-weight:600;color:var(--text)}
 .st em{font-style:normal;color:var(--faint)}
@@ -57,28 +60,47 @@ a{color:#7dd3fc}
 .sdot.err{background:var(--err);box-shadow:0 0 0 3px rgba(251,113,133,.16)}
 .sdot.cool{background:var(--warn)}
 @keyframes pulse{50%{opacity:.35}}
-.rate{font-size:11.5px;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+.rate{margin-left:auto;font-size:11.5px;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums;padding-left:4px}
 .rate b{color:var(--text)} .rate b.live{color:var(--ok)}
-.stage-view{position:relative;height:clamp(124px,24vh,210px);background:#0b0819}
-.stage-view canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage-view{position:relative;flex:none;height:clamp(240px,42vh,520px);background:#0b0819;overflow:hidden}
+.stage-view canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation}
 .stage.collapsed .stage-view{display:none}
 .stage .chev{transition:transform .2s}
 .stage.collapsed .chev{transform:rotate(180deg)}
+#app.stage-max .stage{flex:1 1 0;min-height:0}
+#app.stage-max .stage-view{flex:1 1 0;height:auto;min-height:0}
+#app.stage-max .chat{display:none}
 body.short .stage{display:none}
+.co-info{position:absolute;left:10px;right:10px;bottom:10px;max-height:62%;overflow-y:auto;z-index:2;padding:12px 42px 10px 12px;border-radius:14px;
+  background:rgba(13,11,29,.96);border:1px solid var(--line2);font-size:13px;line-height:1.45;box-shadow:0 18px 40px -16px #000}
+.co-info .info-x{position:absolute;right:6px;top:6px}
+.co-info .ih{display:flex;align-items:center;gap:8px;font-size:14px}
+.co-info .isub{font-size:12px;color:var(--faint);margin:3px 0 6px}
+.co-info .itext{color:var(--dim);margin-bottom:6px}
+.stage-pill{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:6px;height:40px;padding:0 18px;border-radius:999px;
+  background:var(--grad);color:#fff;font-weight:600;font-size:13.5px;white-space:nowrap;box-shadow:0 10px 26px -10px rgba(255,61,154,.9)}
+.stage-pill .ic{width:16px;height:16px}
 
 /* ---------- sohbet ---------- */
 .chat{flex:1 1 0;min-height:0;overflow-y:auto;padding:16px 14px 10px;display:flex;flex-direction:column;gap:14px;overscroll-behavior:contain}
 .msg{animation:rise .22s ease-out}
 @keyframes rise{from{opacity:0;transform:translateY(6px)}}
-.msg.user{align-self:flex-end;max-width:86%;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.msg.user{align-self:flex-end;max-width:88%;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .utext{background:var(--grad);color:#fff;padding:10px 14px;border-radius:18px 18px 6px 18px;font-size:15px;line-height:1.5;white-space:pre-wrap;word-break:break-word;box-shadow:0 10px 24px -14px rgba(255,61,154,.9)}
+.umode{font-size:11px;color:var(--faint);display:flex;align-items:center;gap:5px}
+.umode .ic{width:13px;height:13px}
 .thumb{max-width:170px;max-height:170px;border-radius:14px;border:1px solid var(--line2);display:block}
+.healed{max-width:100%;background:var(--panel);border:1px dashed var(--line2);border-radius:14px;padding:8px 12px;font-size:13px;color:var(--dim);line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.healed summary,.healed>b{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--accent);font-size:12px;font-weight:700;white-space:normal}
+.healed summary::-webkit-details-marker{display:none}
+.healed .ic{width:14px;height:14px}
+.healed .act{margin:4px 0 0 -8px}
 .ai-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:11px 14px 6px}
 .ai-card::before{content:"";position:absolute;left:-1px;top:12px;bottom:12px;width:3px;border-radius:0 3px 3px 0;background:var(--c)}
 .ai-head{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);margin-bottom:6px;min-width:0}
 .ai-head b{color:var(--c);font-weight:700;font-size:12.5px;flex:none}
 .ai-head .model{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:11px var(--mono);color:var(--faint)}
-.ai-head .ms{margin-left:auto;flex:none;font-size:11px;font-variant-numeric:tabular-nums;padding:2px 8px;border-radius:999px;background:var(--raise);color:var(--text)}
+.ms{margin-left:auto;flex:none;font-size:11px;font-variant-numeric:tabular-nums;padding:2px 8px;border-radius:999px;background:var(--raise);color:var(--text)}
 .medal{font-size:15px;flex:none}
 .is-err .ai-card{border-color:rgba(251,113,133,.32);background:linear-gradient(rgba(251,113,133,.06),rgba(251,113,133,.06)),var(--panel)}
 .err-text{color:#fecdd3;font-size:14px;line-height:1.5;padding-bottom:4px}
@@ -86,13 +108,13 @@ body.short .stage{display:none}
 .stopped{color:var(--warn)}
 .pending{display:flex;align-items:center;gap:8px;color:var(--dim);font-size:13.5px;padding:2px 0 8px}
 .dots{display:inline-flex;gap:4px}
-.dots i{width:6px;height:6px;border-radius:50%;background:var(--c);animation:bounce 1s infinite}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--c,var(--accent));animation:bounce 1s infinite}
 .dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
 @keyframes bounce{0%,80%,100%{transform:none;opacity:.35}40%{transform:translateY(-4px);opacity:1}}
-.caret{display:inline-block;width:7px;height:15px;margin-left:2px;vertical-align:-2px;background:var(--c);animation:blink 1s steps(1) infinite}
+.caret{display:inline-block;width:7px;height:15px;margin-left:2px;vertical-align:-2px;background:var(--c,var(--accent));animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .ai-actions{display:flex;gap:2px;margin:4px 0 0 -8px;flex-wrap:wrap}
-.act{display:flex;align-items:center;gap:5px;height:32px;padding:0 9px;border-radius:10px;color:var(--faint);font-size:12.5px;font-weight:500}
+.act{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 9px;border-radius:10px;color:var(--faint);font-size:12.5px;font-weight:500}
 .act .ic{width:16px;height:16px}
 .act:hover,.act:active{background:var(--raise);color:var(--text)}
 .act.done{color:var(--ok)}
@@ -100,6 +122,62 @@ body.short .stage{display:none}
 .cmp-head{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--dim);letter-spacing:.2px}
 .cmp-head .ic{width:16px;height:16px}
 .cmp-head .act{margin-left:auto}
+
+/* çok adımlı çalışmalar */
+.run{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 14px 6px}
+.run::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--grad)}
+.run-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;min-width:0}
+.run-head .ic{color:var(--accent);width:18px;height:18px}
+.run-head b{font-size:14px;flex:none}
+.run-meta{font-size:11.5px;color:var(--faint);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.run-task{font-size:13px;color:var(--dim);line-height:1.45;margin-bottom:8px}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.step{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:var(--raise);font-size:11.5px;color:var(--dim);border:1px solid transparent;white-space:nowrap}
+.step i{width:7px;height:7px;border-radius:50%;background:#3b3558;flex:none}
+.step em{font-style:normal;color:var(--faint)}
+.step.run{color:var(--text);border-color:rgba(251,191,36,.35)}
+.step.run i{background:var(--warn);animation:pulse .9s infinite}
+.step.ok i{background:var(--ok)}
+.step.err{color:var(--err)} .step.err i{background:var(--err)}
+.step.stop i{background:var(--dim)}
+.note{font-size:13px;color:var(--dim);line-height:1.5;margin:4px 0 8px}
+.note b{color:var(--text)}
+details.box{border:1px solid var(--line);border-radius:12px;background:#0d0b1d;margin:8px 0}
+details.box>summary{list-style:none;cursor:pointer;padding:10px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;min-width:0}
+details.box>summary::-webkit-details-marker{display:none}
+details.box>summary::after{content:"";flex:none;margin-left:auto;width:7px;height:7px;border-right:1.6px solid var(--dim);border-bottom:1.6px solid var(--dim);transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+details.box[open]>summary::after{transform:rotate(225deg)}
+details.box>summary .sum-t{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+details.box>summary .sum-x{flex:none;font-weight:500;color:var(--faint);font-size:12px}
+.box-body{padding:0 12px 10px;font-size:13.5px}
+.agent-row{display:flex;gap:9px;padding:6px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.4}
+.agent-row:first-child{border-top:0}
+.adot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex:none}
+.agent-row small{display:block;color:var(--faint);font-size:12px}
+.tline{padding:5px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.45;color:var(--dim)}
+.tline b{color:var(--text);font-weight:600}
+.tline:first-child{border-top:0}
+.tt{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;margin-right:6px;background:var(--raise);vertical-align:1px}
+.round-h{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);font-weight:700;margin:8px 0 2px}
+.ticker{margin:6px 0 4px}
+.ticker .tline{border:0;padding:3px 0;animation:rise .25s ease-out}
+.report{border-top:1px solid var(--line);margin-top:8px;padding-top:10px}
+.report-title{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.report-title .ic{width:15px;height:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.kchip{font-size:11.5px;padding:3px 9px;border-radius:999px;background:var(--raise);color:var(--dim)}
+.kchip b{color:var(--text)}
+.crit{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--raise);font-size:13px}
+.crit>b{display:block;font-size:11.5px;color:var(--warn);margin-bottom:2px}
+.scores{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0}
+.scores th{font-size:11px;color:var(--faint);font-weight:600;text-align:left;padding:4px 4px 6px}
+.scores td{padding:7px 4px;border-top:1px solid var(--line);vertical-align:middle}
+.scores .tot{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.sbar{height:6px;border-radius:6px;background:#0a0818;overflow:hidden;min-width:34px}
+.sbar i{display:block;height:100%;border-radius:6px}
+.win{color:var(--warn)}
+.idx{flex:none;width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:700;background:var(--raise);color:var(--dim)}
+.gorev{font-size:12.5px;color:var(--faint);font-style:italic;margin-bottom:6px}
 
 /* markdown */
 .md{font-size:15px;line-height:1.62;word-break:break-word;padding-bottom:4px}
@@ -125,11 +203,13 @@ body.short .stage{display:none}
 .tbl th{background:var(--raise);font-weight:600}
 
 /* boş ekran */
-.empty{margin:auto;width:100%;max-width:540px;text-align:center;padding:8px 2px}
-.empty-logo{width:54px;height:54px;margin:0 auto 14px;border-radius:17px;background:var(--grad);display:grid;place-items:center;font-size:25px;color:#fff;box-shadow:0 14px 34px -12px rgba(255,61,154,.8)}
+.empty{margin:auto;width:100%;max-width:560px;text-align:center;padding:8px 2px}
+.empty-logo{width:54px;height:54px;margin:0 auto 14px;border-radius:17px;background:var(--grad);display:grid;place-items:center;color:#fff;box-shadow:0 14px 34px -12px rgba(255,61,154,.8)}
+.empty-logo .ic{width:26px;height:26px}
 .empty h2{font-size:21px;font-weight:700;letter-spacing:-.2px}
-.empty p{color:var(--dim);font-size:14px;line-height:1.55;margin:6px auto 16px;max-width:420px}
-.cta{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:14px;background:var(--grad);color:#fff;font-weight:600;font-size:14.5px;margin-bottom:16px;box-shadow:0 10px 26px -10px rgba(255,61,154,.9)}
+.empty p{color:var(--dim);font-size:14px;line-height:1.55;margin:6px auto 6px;max-width:460px}
+.empty .cost{font-size:12px;color:var(--faint);margin-bottom:14px}
+.cta{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:14px;background:var(--grad);color:#fff;font-weight:600;font-size:14.5px;margin:6px 0 16px;box-shadow:0 10px 26px -10px rgba(255,61,154,.9)}
 .quick{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}
 .quick button{display:flex;flex-direction:column;gap:5px;padding:12px;border-radius:14px;background:var(--panel);border:1px solid var(--line);transition:border-color .15s,transform .15s}
 .quick button:hover{border-color:var(--line2)}
@@ -146,13 +226,17 @@ body.short .stage{display:none}
 .pill .ic{width:15px;height:15px;color:var(--dim)}
 .pill::after{content:"";position:absolute;right:11px;top:50%;width:6px;height:6px;border-right:1.6px solid var(--dim);border-bottom:1.6px solid var(--dim);transform:translateY(-70%) rotate(45deg);pointer-events:none}
 .pill select{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;font-size:16px}
-.attach[hidden]{display:none}
+.pill.mode{border-color:rgba(255,61,154,.45);background:rgba(255,61,154,.08)}
+.pill.mode .ic{color:var(--accent)}
+.chip{flex:none;display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);background:var(--panel);font-size:12.5px;font-weight:600;color:var(--dim)}
+.chip .ic{width:15px;height:15px}
+.chip.on{background:var(--grad);border-color:transparent;color:#fff}
 .attach{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:6px;border-radius:14px;background:var(--panel);border:1px solid var(--line2)}
 .attach img{width:44px;height:44px;object-fit:cover;border-radius:10px}
 .attach span{flex:1;font-size:12.5px;color:var(--dim)}
 .input-row{display:flex;align-items:flex-end;gap:4px;background:var(--panel);border:1px solid var(--line2);border-radius:22px;padding:5px;transition:border-color .2s,box-shadow .2s}
 .input-row:focus-within{border-color:rgba(255,61,154,.5);box-shadow:0 0 0 4px rgba(255,61,154,.1)}
-#input{flex:1;min-width:0;height:40px;max-height:150px;resize:none;background:none;border:0;outline:none;color:var(--text);font:16px/1.4 var(--font);padding:9px 4px}
+#input{flex:1;min-width:0;height:40px;max-height:150px;resize:none;background:none;border:0;outline:none;color:var(--text);font:16px/1.4 var(--font);padding:9px 6px}
 #input::placeholder{color:var(--faint)}
 .input-row .icon-btn{width:40px;height:40px}
 #micBtn.live{color:var(--accent);background:rgba(255,61,154,.12)}
@@ -191,7 +275,7 @@ body.short .stage{display:none}
 .drawer-foot b{color:var(--dim)}
 
 /* ---------- ayarlar ---------- */
-.sheet{position:fixed;left:0;right:0;bottom:0;max-width:880px;margin:0 auto;max-height:92vh;max-height:92dvh;z-index:22;display:flex;flex-direction:column;
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:920px;margin:0 auto;max-height:92vh;max-height:92dvh;z-index:22;display:flex;flex-direction:column;
   background:#0d0b1d;border:1px solid var(--line2);border-bottom:0;border-radius:22px 22px 0 0;transform:translateY(104%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
 .sheet.show{transform:none}
 .grab{width:42px;height:4px;border-radius:4px;background:var(--line2);margin:8px auto 0;flex:none}
@@ -218,6 +302,7 @@ select.inp option{background:#14112a}
 textarea.inp{height:auto;min-height:76px;padding:10px 12px;line-height:1.45;resize:vertical}
 .hint{font-size:11.5px;color:var(--faint);margin-top:5px;line-height:1.45}
 .keylink{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;margin-top:6px;text-decoration:none}
+.keylink .ic{width:14px;height:14px}
 .prov-foot{display:flex;align-items:center;gap:10px}
 .usage{flex:1;font-size:12px;color:var(--dim)}
 .bar{height:4px;border-radius:4px;background:var(--raise);margin-top:6px;overflow:hidden}
@@ -243,12 +328,12 @@ textarea.inp{height:auto;min-height:76px;padding:10px 12px;line-height:1.45;resi
 
 @media (max-width:430px){
   .act span{display:none}
+  .act[data-act=regen] span,.act[data-act=retry] span,.act[data-act=settings] span,.act[data-act=replay] span,.act[data-act=orig] span{display:inline}
   .rl{display:none}
-  .sts{gap:11px}
-  .act[data-act=regen] span,.act[data-act=retry] span,.act[data-act=settings] span{display:inline}
 }
 @media (min-width:700px){
-  .stage-view{height:clamp(190px,30vh,290px)}
+  .stage{margin:2px 12px 0;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .stage-view{height:clamp(300px,46vh,600px)}
   .quick{grid-template-columns:repeat(4,1fr)}
 }
 </style>
@@ -267,20 +352,34 @@ textarea.inp{height:auto;min-height:76px;padding:10px 12px;line-height:1.45;resi
 
   <section class="stage" id="stage">
     <div class="stage-head">
+      <div class="tabs" id="tabs">
+        <button class="tab" data-view="office">Ofis</button>
+        <button class="tab" data-view="company">Şirket</button>
+        <button class="tab" data-view="pipeline">Bant</button>
+      </div>
       <div class="sts" id="sts"></div>
       <span class="rate" id="rate"></span>
+      <button class="icon-btn sm" id="stageMax" aria-label="Canlı ekranı büyüt"></button>
       <button class="icon-btn sm" id="stageToggle" aria-label="Canlı ekranı aç/kapat"></button>
     </div>
-    <div class="stage-view"><canvas id="scene" aria-label="Canlı ajan ofisi"></canvas></div>
+    <div class="stage-view" id="stageView">
+      <canvas id="scene" aria-label="Canlı ekran"></canvas>
+      <div class="co-info" id="coInfo" hidden></div>
+      <button class="stage-pill" id="stagePill" hidden></button>
+    </div>
   </section>
 
   <main class="chat" id="chat"></main>
 
   <footer class="composer">
     <div class="tools">
-      <label class="pill" title="Kime sorulsun?"><span data-icon="target"></span><span id="targetVal"></span><select id="targetSel" aria-label="Hedef"></select></label>
-      <label class="pill" title="Görev türü"><span data-icon="spark"></span><span id="taskVal"></span><select id="taskSel" aria-label="Görev"></select></label>
-      <label class="pill" title="Cevap uzunluğu"><span data-icon="len"></span><span id="lenVal"></span><select id="lenSel" aria-label="Uzunluk"></select></label>
+      <label class="pill mode" title="Çalışma modu"><span data-icon="layers"></span><span id="modeVal"></span><select id="modeSel" aria-label="Mod"></select></label>
+      <label class="pill" id="pTarget" title="Kime sorulsun?"><span data-icon="target"></span><span id="targetVal"></span><select id="targetSel" aria-label="Hedef"></select></label>
+      <label class="pill" id="pTask" title="Görev türü"><span data-icon="spark"></span><span id="taskVal"></span><select id="taskSel" aria-label="Görev"></select></label>
+      <label class="pill" id="pAgents" title="Ajan sayısı"><span data-icon="users"></span><span id="agentsVal"></span><select id="agentsSel" aria-label="Ajan sayısı"></select></label>
+      <label class="pill" id="pJudge" title="Hakem model"><span data-icon="trophy"></span><span id="judgeVal"></span><select id="judgeSel" aria-label="Hakem"></select></label>
+      <label class="pill" id="pLen" title="Cevap uzunluğu"><span data-icon="len"></span><span id="lenVal"></span><select id="lenSel" aria-label="Uzunluk"></select></label>
+      <button class="chip" id="healBtn" title="İstemi göndermeden önce otomatik iyileştir"><span data-icon="wand"></span>İyileştir</button>
     </div>
     <div class="attach" id="attach" hidden>
       <img id="attachImg" alt="Eklenen görsel">
@@ -329,10 +428,15 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 const coarse=matchMedia('(pointer:coarse)').matches;
 const fmtMs=ms=>ms==null?'—':ms<1000?ms+' ms':(ms/1000).toFixed(1).replace('.',',')+' sn';
+const fmtK=n=>n<1000?String(n):(n/1000).toFixed(1).replace('.',',')+'k';
 const fmtNum=n=>Number(n||0).toLocaleString('tr-TR');
+const clip=(s,n)=>{s=String(s||'');return s.length>n?s.slice(0,n)+' …(kısaltıldı)':s;};
+const trunc=(s,n)=>{s=String(s||'');return s.length>n?s.slice(0,n-1)+'…':s;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function ago(ts){const s=(Date.now()-ts)/1000;if(s<60)return'az önce';if(s<3600)return Math.floor(s/60)+' dk önce';if(s<86400)return Math.floor(s/3600)+' sa önce';return Math.floor(s/86400)+' gün önce';}
 function hexRgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255];}
 function mix(a,b,t){const A=hexRgb(a),B=hexRgb(b);return'rgb('+A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')+')';}
+function rgba(h,a){const[r,g,b]=hexRgb(h);return`rgba(${r},${g},${b},${a})`;}
 function vibrate(ms){try{navigator.vibrate&&navigator.vibrate(ms);}catch{}}
 
 const ICON={
@@ -362,12 +466,23 @@ const ICON={
   doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7M9 8h3"/>',
   bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>',
   ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
-  bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>'
+  bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 6 4.8"/>',
+  scale:'<path d="M12 3v18M7 21h10M5 7h14M5 7l-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0z"/>',
+  factory:'<path d="M3 21V10l5 3V10l5 3V10l5 3V4h3v17z"/><path d="M7 17h2M12 17h2M17 17h2"/>',
+  wand:'<path d="M4 20L15 9"/><path d="M15 3v3M21 9h-3M19.5 4.5l-2 2"/><path d="M13 7l4 4"/>',
+  expand:'<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',
+  shrink:'<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/>',
+  play:'<path d="M7 4l13 8-13 8z"/>',
+  map:'<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.4 6.2l7.1.6M7.3 8.3l3.6 7.4M16.8 9.2l-3.5 6.6"/>',
+  chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/>',
+  trophy:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/>',
+  down:'<path d="M12 5v14M5 12l7 7 7-7"/>'
 };
 const ic=n=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]||''}</svg>`;
 
 /* =====================================================================
-   SAĞLAYICILAR, GÖREVLER
+   SAĞLAYICILAR, MODLAR, GÖREVLER
    ===================================================================== */
 const PROVIDERS=[
   {id:'groq',name:'Groq',short:'GROQ',color:'#22d3ee',note:'En hızlı',
@@ -384,6 +499,12 @@ const PROVIDERS=[
    pick:d=>d.filter(m=>String(m.id).endsWith(':free')||(m.pricing&&Number(m.pricing.prompt)===0&&Number(m.pricing.completion)===0)).map(m=>String(m.id)).filter(id=>!/^openrouter\//.test(id))}
 ];
 const P=id=>PROVIDERS.find(p=>p.id===id);
+const MODES={
+  sohbet:{label:'Sohbet',icon:'chat',ph:'Bir şey sor…'},
+  sirket:{label:'Şirket',icon:'users',ph:'Şirkete bir görev ver…'},
+  munazara:{label:'Münazara',icon:'scale',ph:'Tartışılacak soruyu yaz…'},
+  bant:{label:'Üretim bandı',icon:'factory',ph:'Üretilecek işi tarif et…'}
+};
 const TASKS={
   genel:{label:'Genel',sys:''},
   kod:{label:'Kod',sys:'Uzman bir yazılımcı gibi davran. Çalışan, temiz kod ver; kodu kod bloğu içinde yaz ve kısaca açıkla.'},
@@ -393,14 +514,43 @@ const TASKS={
   fikir:{label:'Fikir',sys:'Yaratıcı bir danışmansın. Somut, uygulanabilir ve çeşitli fikirleri maddeler halinde sun.'}
 };
 const LENGTHS={kisa:{label:'Kısa',sys:'Cevabını kısa ve öz tut.'},normal:{label:'Normal',sys:''},detayli:{label:'Detaylı',sys:'Ayrıntılı, adım adım ve örneklerle açıkla.'}};
-const TARGETS=()=>[['auto','Otomatik'],['all','Hepsi · yarıştır'],...PROVIDERS.map(p=>[p.id,p.name+(state.keys[p.id]?'':' (anahtar yok)')])];
 const BASE_SYS='Kullanıcı hangi dilde yazıyorsa o dilde cevap ver. Gerektiğinde Markdown (başlık, liste, tablo, kod bloğu) kullan.';
-const QUICK=[
-  {icon:'code',title:'Kod yaz',task:'kod',text:'Python ile bir klasördeki tüm .txt dosyalarındaki kelimeleri sayan bir program yaz.'},
-  {icon:'globe',title:'Çevir',task:'ceviri',text:'Şu metni İngilizceye çevir: '},
-  {icon:'doc',title:'Özetle',task:'ozet',text:'Aşağıdaki metni özetle:\n'},
-  {icon:'bulb',title:'Fikir bul',task:'fikir',text:'Hafta sonu için bütçe dostu 5 etkinlik önerir misin?'}
-];
+const TYPES=['fikir','eleştiri','geliştirme','soru','destek'];
+const TYPE_COL={'fikir':'#22d3ee','eleştiri':'#fb7185','geliştirme':'#34d399','soru':'#fbbf24','destek':'#a78bfa'};
+const MODE_INFO={
+  sohbet:{icon:'chat',title:g=>`${g}, ne sormak istersin?`,
+    desc:'Groq, Gemini ve OpenRouter tek ekranda. Hedefi “Hepsi” yaparsan cevaplar yarışır, en hızlısı madalya alır.',
+    cost:()=>'Her soru 1 istek',
+    quick:[
+      {icon:'code',title:'Kod yaz',task:'kod',text:'Python ile bir klasördeki tüm .txt dosyalarındaki kelimeleri sayan bir program yaz.'},
+      {icon:'globe',title:'Çevir',task:'ceviri',text:'Şu metni İngilizceye çevir: '},
+      {icon:'doc',title:'Özetle',task:'ozet',text:'Aşağıdaki metni özetle:\n'},
+      {icon:'bulb',title:'Fikir bul',task:'fikir',text:'Hafta sonu için bütçe dostu 5 etkinlik önerir misin?'}]},
+  sirket:{icon:'users',title:()=>'Mikro-ajan şirketi',
+    desc:'Görevin analiz edilir ve ona özel bir kadro araştırılıp kurulur; ikinci bir model kadroyu denetleyip tayin eder. Ajanları üç farklı yapay zekâ canlandırır: iki tur tartışır, eleştirir, geliştirir ve konsensüs raporu çıkarır.',
+    cost:k=>`Yaklaşık ${3+2*Math.max(1,k)} istek · 20–60 sn`,
+    quick:[
+      {icon:'bulb',title:'Uygulama fikri',text:'Bana yeni bir mobil uygulama fikri bul.'},
+      {icon:'users',title:'Kampanya',text:'Küçük bir mahalle kafesinin müşteri sayısını artıracak bir kampanya tasarla.'},
+      {icon:'spark',title:'Yan iş',text:'Üniversite öğrencileri için düşük sermayeli bir yan iş modeli geliştir.'},
+      {icon:'target',title:'Problem çöz',text:'Evden çalışanların dikkat dağınıklığı sorununa çözüm bul.'}]},
+  munazara:{icon:'scale',title:()=>'Münazara ve hakemlik',
+    desc:'Modeller aynı soruya cevap verir, birbirinin cevabını eleştirir. Hakem cevapları isimsiz puanlar, kazananı seçer ve en iyi kısımları birleştirip nihai cevabı yazar.',
+    cost:k=>`Yaklaşık ${2*Math.max(2,k)+2} istek · 15–60 sn`,
+    quick:[
+      {icon:'scale',title:'Tartış',text:'Yeni başlayan biri için en iyi ilk programlama dili hangisi?'},
+      {icon:'doc',title:'Karşılaştır',text:'Kirada oturmak mı, kredi çekip ev almak mı daha mantıklı?'},
+      {icon:'globe',title:'Doğruyu bul',text:'Uzaktan çalışma verimliliği artırır mı?'},
+      {icon:'bulb',title:'Strateji',text:'Küçük bir işletme sosyal medyada önce hangi platforma odaklanmalı?'}]},
+  bant:{icon:'factory',title:()=>'Üretim bandı',
+    desc:'İşine özel, sıralı bir üretim hattı tasarlanır. Her istasyonda farklı bir model önceki istasyonun çıktısını alıp geliştirir; sonda kullanıma hazır sonuç çıkar.',
+    cost:()=>'Yaklaşık 4–6 istek · 20–90 sn',
+    quick:[
+      {icon:'doc',title:'Tanıtım yazısı',text:'Kahve dükkânım için Instagram tanıtım yazısı hazırla.'},
+      {icon:'code',title:'Mini uygulama',text:'Tek dosyalık basit bir yapılacaklar listesi web uygulaması kodla.'},
+      {icon:'target',title:'Plan',text:'Kişisel bütçe tutmaya başlamak için 30 günlük plan hazırla.'},
+      {icon:'spark',title:'Öykü',text:'Kısa bir bilim kurgu öyküsü yaz.'}]}
+};
 
 /* =====================================================================
    KALICI DURUM
@@ -425,12 +575,19 @@ function loadState(){
   }
   s.keys=s.keys||{}; s.models=s.models||{}; s.modelLists=s.modelLists||{}; s.modelFetchedAt=s.modelFetchedAt||{};
   s.convs=Array.isArray(s.convs)?s.convs:[]; s.currentId=s.currentId||null;
-  s.settings=Object.assign({target:'auto',task:'genel',len:'normal',persona:'',stageCollapsed:false,autoSpeak:false},s.settings||{});
+  s.settings=Object.assign({target:'auto',task:'genel',len:'normal',persona:'',stageCollapsed:false,autoSpeak:false,mode:'sohbet',agents:12,judge:'auto',heal:false},s.settings||{});
   s.usage=s.usage||{date:today(),counts:{}};
   s.recent=Array.isArray(s.recent)?s.recent.filter(r=>r.ok!==null):[];
   s.stats=s.stats||{req:0,tok:0,err:0};
-  // yarım kalmış mesajları kapat
-  s.convs.forEach(c=>c.msgs.forEach(m=>{const fix=x=>{if(x.pending){x.pending=false;if(!x.text){x.error='Uygulama kapandığı için cevap tamamlanamadı.';}else x.stopped=true;}};fix(m);(m.items||[]).forEach(fix);}));
+  // yarım kalmış işleri kapat
+  const fix=x=>{ if(x&&x.pending){ x.pending=false; if(['company','debate','pipeline'].includes(x.role)||x.text) x.stopped=true; else x.error=x.error||'Uygulama kapandığı için tamamlanamadı.'; } };
+  s.convs.forEach(c=>c.msgs.forEach(m=>{
+    fix(m); (m.items||[]).forEach(fix);
+    (m.stations||[]).forEach(st=>{ fix(st); if(st.status==='run') st.status='stop'; });
+    (m.steps||[]).forEach(st=>{ if(st.status==='run') st.status='stop'; });
+    if(m.phase&&!['done','err','stop'].includes(m.phase)) m.phase='stop';
+    if(m.healing){ m.healing=false; delete m.healPreview; }
+  }));
   return s;
 }
 let saveT=0;
@@ -449,9 +606,10 @@ function curModel(p){ const l=modelList(p), m=state.models[p.id]; return l.inclu
 function avgLat(pid){ const a=state.recent.filter(r=>r.pid===pid&&r.ok===true&&r.ms).slice(-5); return a.length?a.reduce((s,r)=>s+r.ms,0)/a.length:null; }
 
 /* =====================================================================
-   CANLI DURUM (sahne ve göstergeler bunu okur)
+   CANLI DURUM
    ===================================================================== */
-const live={prov:{},cooldown:{},coolTotal:{},packets:[],rings:[],rate:[],inflight:0,controller:null,typingAt:0,typed:0,focus:false,logs:[]};
+const live={prov:{},cooldown:{},coolTotal:{},packets:[],rings:[],rate:[],inflight:0,controller:null,typingAt:0,typed:0,focus:false,logs:[],
+  view:'office',co:null,pl:null,plMove:null,stagePill:null};
 PROVIDERS.forEach(p=>{
   const last=[...state.recent].reverse().find(r=>r.pid===p.id&&r.ok===true);
   live.prov[p.id]={phase:'idle',chars:0,lastDelta:0,doneAt:0,errAt:0,lastMs:last?last.ms:null,bubble:null,lastEmit:0};
@@ -478,7 +636,7 @@ function blocked(p){
 function tokRate(){ const n=Date.now(); live.rate=live.rate.filter(r=>n-r[0]<1500); if(!live.rate.length) return 0; return Math.max(1,Math.round(live.rate.reduce((s,r)=>s+r[1],0)/4/1.5)); }
 function log(kind,msg){
   const t=new Date().toTimeString().slice(0,8);
-  live.logs.push({t,kind,msg}); if(live.logs.length>80) live.logs.shift();
+  live.logs.push({t,kind,msg}); if(live.logs.length>100) live.logs.shift();
   const box=$('#logbox'); if(box){ box.insertAdjacentHTML('beforeend',`<div class="${kind}"><span class="t">${t}</span>${esc(msg)}</div>`); box.scrollTop=box.scrollHeight; }
 }
 function emitPacket(pid,dir){ const i=PROVIDERS.findIndex(p=>p.id===pid); if(i<0) return; live.packets.push({i,dir,t0:performance.now(),dur:dir==='out'?650:520,color:PROVIDERS[i].color}); if(live.packets.length>90) live.packets.splice(0,live.packets.length-90); }
@@ -488,15 +646,15 @@ function setBubble(pid,text,kind){ live.prov[pid].bubble={text,kind,until:Date.n
    API
    ===================================================================== */
 function mkErr(kind,msg){const e=new Error(msg);e.kind=kind;return e;}
-async function callProvider(p,messages,{signal,onDelta,onThink}={}){
-  const model=curModel(p);
+async function callProvider(p,messages,{signal,onDelta,onThink,model}={}){
+  model=model||curModel(p);
   let res;
   try{
     res=await fetch(p.base+'/chat/completions',{method:'POST',signal,
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+state.keys[p.id]},
       body:JSON.stringify({model,messages,stream:true})});
   }catch(e){
-    if(e.name==='AbortError') throw e;
+    if(signal&&signal.aborted) throw e;
     throw mkErr('net',`${p.name}: bağlantı kurulamadı. İnternetini kontrol et; sorun sürerse sağlayıcı tarayıcı isteklerini engelliyor olabilir.`);
   }
   if(!res.ok){
@@ -543,6 +701,88 @@ async function callProvider(p,messages,{signal,onDelta,onThink}={}){
   return {text:text||'(boş yanıt)',tok:tok||Math.ceil(text.length/4),model:mdl};
 }
 
+/* Her API çağrısı buradan geçer: canlı ekran, sayaçlar ve kayıtlar bu fonksiyondan beslenir. */
+async function streamInto(msg,p,messages,rootId,opts={}){
+  const lp=live.prov[p.id];
+  lp.phase='wait'; lp.chars=0; lp.lastDelta=0; live.inflight++;
+  addUsage(p.id);
+  const model=opts.model||curModel(p);
+  const rec={pid:p.id,ok:null,tok:0,ms:0,at:Date.now()};
+  state.recent.push(rec); if(state.recent.length>30) state.recent.splice(0,state.recent.length-30);
+  emitPacket(p.id,'out');
+  log('req',`→ ${p.name} · ${model}`);
+  const parent=live.controller?.signal;
+  let ctl=null,timer=0,signal=parent;
+  if(opts.timeout){
+    ctl=new AbortController(); signal=ctl.signal;
+    if(parent){ if(parent.aborted) ctl.abort('user'); else parent.addEventListener('abort',()=>ctl.abort('user'),{once:true}); }
+    timer=setTimeout(()=>ctl.abort('timeout'),opts.timeout);
+  }
+  const t0=performance.now();
+  try{
+    const r=await callProvider(p,messages,{signal,model,
+      onDelta:(full,d)=>{
+        msg.text=full; lp.phase='stream'; lp.chars=full.length; lp.lastDelta=Date.now();
+        live.rate.push([Date.now(),d.length]);
+        const n=performance.now(); if(n-lp.lastEmit>70){ lp.lastEmit=n; emitPacket(p.id,'in'); }
+        if(opts.hook) opts.hook(full);
+        scheduleRender(rootId);
+      },
+      onThink:()=>{ if(lp.phase==='wait'){ lp.phase='think'; scheduleRender(rootId); } }});
+    const ms=Math.round(performance.now()-t0);
+    Object.assign(msg,{text:r.text,model:r.model,ms,tok:r.tok,pending:false,error:null,errorKind:null});
+    Object.assign(rec,{ok:true,tok:r.tok,ms});
+    state.stats.req++; state.stats.tok+=r.tok;
+    Object.assign(lp,{phase:'done',doneAt:Date.now(),lastMs:ms,errAt:0});
+    setBubble(p.id,fmtMs(ms).replace(' ',''),'ok');
+    live.rings.push({t0:performance.now(),color:p.color});
+    log('ok',`✓ ${p.name} · ${fmtMs(ms)} · ${r.tok} token`);
+    return {ok:true};
+  }catch(e0){
+    let e=e0;
+    const ms=Math.round(performance.now()-t0);
+    if(signal&&signal.aborted){
+      if(signal.reason!=='timeout'){
+        Object.assign(msg,{pending:false,stopped:true,ms});
+        Object.assign(rec,{ok:'stop',ms,tok:Math.ceil((msg.text||'').length/4)});
+        lp.phase='idle'; log('sys',`■ ${p.name} durduruldu`);
+        return {aborted:true};
+      }
+      e=mkErr('timeout',`${p.name}: ${Math.round(opts.timeout/1000)} sn içinde cevap vermedi (zaman aşımı).`);
+    }
+    Object.assign(msg,{pending:false,error:e.message,errorKind:e.kind||'http',ms});
+    Object.assign(rec,{ok:false,ms});
+    state.stats.err++; lp.phase='error'; lp.errAt=Date.now();
+    setBubble(p.id,e.kind==='rate'?'LIMIT':'HATA','err');
+    log('err',`✗ ${e.message}`);
+    if(e.kind==='model') refreshModels(p,{silent:true});
+    return {ok:false,hadText:!!msg.text};
+  }finally{
+    clearTimeout(timer);
+    live.inflight=Math.max(0,live.inflight-1);
+    scheduleRender(rootId); saveSoon();
+  }
+}
+function parseJSON(t){
+  if(!t) return null;
+  let s=String(t).replace(/```(?:json)?/gi,'').trim();
+  const a=s.indexOf('{'), b=s.lastIndexOf('}');
+  if(a<0||b<=a) return null;
+  s=s.slice(a,b+1);
+  try{return JSON.parse(s);}catch{}
+  try{return JSON.parse(s.replace(/,\s*([}\]])/g,'$1'));}catch{}
+  return null;
+}
+async function jsonCall(m,p,messages,{step,timeout=45000}={}){
+  const o={id:uid(),pid:p.id,text:'',pending:true}; m.reqs++;
+  const r=await streamInto(o,p,messages,m.id,{timeout,hook:full=>{ if(step) step.chars=full.length; }});
+  if(r.aborted) return {aborted:true};
+  if(!r.ok) return {error:o.error};
+  const data=parseJSON(o.text);
+  if(!data) return {error:`${p.name} beklenen JSON biçiminde cevap vermedi.`};
+  return {data,ms:o.ms,model:o.model};
+}
+
 async function refreshModels(p,{silent=false}={}){
   if(p.id!=='openrouter'&&!state.keys[p.id]){ if(!silent) toast('Önce anahtarı gir'); return false; }
   try{
@@ -566,27 +806,37 @@ async function refreshModels(p,{silent=false}={}){
     return false;
   }
 }
-function autoRefreshModels(){
-  PROVIDERS.forEach(p=>{
-    if(!state.keys[p.id]) return;
-    if(Date.now()-(state.modelFetchedAt[p.id]||0)>864e5) refreshModels(p,{silent:true});
-  });
-}
+function autoRefreshModels(){ PROVIDERS.forEach(p=>{ if(state.keys[p.id]&&Date.now()-(state.modelFetchedAt[p.id]||0)>864e5) refreshModels(p,{silent:true}); }); }
 
 /* =====================================================================
-   GÖNDERME AKIŞI
+   İSTEM METİNLERİ
+   ===================================================================== */
+const lenSys=()=>LENGTHS[state.settings.len]?.sys||'';
+const personaSys=()=>state.settings.persona.trim()?'Kullanıcının kişisel talimatı: '+state.settings.persona.trim():'';
+function systemPrompt(){ return [BASE_SYS,TASKS[state.settings.task]?.sys,lenSys(),personaSys()].filter(Boolean).join('\n'); }
+function systemPromptBase(){ return [BASE_SYS,lenSys(),personaSys()].filter(Boolean).join('\n'); }
+const SYS_HEAL='Sen uzman bir istem (prompt) mühendisisin. Kullanıcının isteğini anlamını ve dilini koruyarak, bir yapay zekânın en iyi sonucu vereceği net, eksiksiz ve profesyonel bir isteme dönüştürürsün: amacı, bağlamı, beklenen çıktı biçimini ve kalite ölçütlerini belirtir, belirsizlikleri makul varsayımlarla giderirsin. İsteği cevaplamaya çalışmazsın; yalnızca iyileştirilmiş istemi yazarsın (en fazla 110 kelime, tırnak veya başlık olmadan).';
+const HEAL_HINT={sohbet:'',sirket:' Bu istem, bir ekibin beyin fırtınası yapacağı görev tanımı olarak kullanılacak.',munazara:' Bu istem, birden çok yapay zekânın tartışacağı soru olarak kullanılacak.',bant:' Bu istem, aşamalı bir üretim hattının üreteceği işin tanımı olarak kullanılacak.'};
+const SYS_PLANNER='Sen deneyimli bir organizasyon tasarımcısı ve araştırmacı proje yöneticisisin. Sana verilen görevi önce analiz eder, çözüm için hangi bilgi ve uzmanlıkların, karar vericilerin, kullanıcı/müşteri bakış açılarının ve eleştirel seslerin gerektiğini araştırır, sonra bu göreve özel ekibi kurarsın. Hazır veya genel geçer rol şablonları kullanmazsın; her rolün bu görevdeki gerekçesi olmalıdır. Yalnızca istenen JSON\'u yazarsın.';
+const SYS_AUDITOR='Sen titiz bir strateji ve insan kaynakları denetçisisin. Bir göreve kurulan ekibi, görevin gerçekten neye ihtiyaç duyduğuna göre denetler ve son kadroyu tayin edersin. Yalnızca istenen JSON\'u yazarsın.';
+const SYS_MEETING='Bir şirketin beyin fırtınası toplantısını canlandırıyorsun. Çıktın yalnızca JSON Lines olmalı: her satırda tek bir JSON nesnesi; başka metin, açıklama, numara ya da kod bloğu yazma.';
+const SYS_MODERATOR='Sen tarafsız bir moderatör ve stratejistsin. Bir toplantı dökümünden net, uygulanabilir bir konsensüs raporu çıkarırsın.';
+const SYS_CRITIC='Sen dürüst ve eleştirel bir değerlendiricisin. Kısa ve somut yazarsın.';
+const SYS_JUDGE='Sen tarafsız bir hakemsin. Cevapları kimin yazdığını bilmezsin; yalnızca içeriğe göre puanlarsın. Uzun cevabı sırf uzun diye ödüllendirmezsin. Yalnızca istenen JSON\'u yazarsın.';
+const SYS_PIPE='Sen bir üretim süreci tasarımcısısın. Bir görevi kaliteli bir sonuca götürecek aşamaları göreve özel olarak tasarlarsın. Yalnızca istenen JSON\'u yazarsın.';
+const ROLE_SHAPE='{"ad":"kısa isim","rol":"göreve özel rol (en fazla 4 kelime)","neden":"bu görevde neden gerekli (en fazla 12 kelime)","tutum":"tartışmadaki tavrı (en fazla 8 kelime)"}';
+
+/* =====================================================================
+   GÖNDERME
    ===================================================================== */
 let busy=false, testing=false, pendingImage=null;
 const currentConv=()=>state.convs.find(c=>c.id===state.currentId)||null;
-
-function systemPrompt(){
-  const s=state.settings;
-  return [BASE_SYS,TASKS[s.task]?.sys,LENGTHS[s.len]?.sys,s.persona.trim()?'Kullanıcının kişisel talimatı: '+s.persona.trim():''].filter(Boolean).join('\n');
-}
 function answerOf(m){
   if(!m) return '';
   if(m.role==='assistant') return m.error?'':(m.text||'');
   if(m.role==='compare'){ const ok=m.items.filter(i=>!i.error&&i.text).sort((a,b)=>(a.ms||1e9)-(b.ms||1e9)); return ok[0]?.text||''; }
+  if(m.role==='company') return m.report||'';
+  if(m.role==='debate'||m.role==='pipeline') return m.final||'';
   return '';
 }
 function contextFor(conv,upto){
@@ -594,103 +844,14 @@ function contextFor(conv,upto){
   for(let i=0;i<upto;i++){
     const m=conv.msgs[i]; if(m.role!=='user') continue;
     const a=answerOf(conv.msgs[i+1]); if(!a) continue;
-    t.push({role:'user',content:m.text||'(görsel gönderildi)'},{role:'assistant',content:a});
+    t.push({role:'user',content:m.healed||m.text||'(görsel gönderildi)'},{role:'assistant',content:clip(a,6000)});
   }
   return t.slice(-12);
 }
-
-async function send(textArg,{regenerate=false,image=null}={}){
-  if(busy) return;
-  if(testing){ toast('Bağlantı testi bitince tekrar dene'); return; }
-  const text=String(textArg??$('#input').value).trim();
-  const img=regenerate?image:pendingImage;
-  if(!text&&!img) return;
-  if(!PROVIDERS.some(p=>state.keys[p.id])){ toast("Başlamak için Ayarlar'dan bir API anahtarı ekle"); openSheet(); return; }
-  let mode=state.settings.target;
-  if(img){ if(!state.keys.gemini){ toast('Görsel sormak için Gemini anahtarı gerekli'); return; } mode='gemini'; }
-
-  let conv=currentConv(); if(!conv) conv=newConv(false);
-  if(!regenerate){
-    const prev=conv.msgs[conv.msgs.length-1];
-    const um={id:uid(),role:'user',text,thumb:img?img.thumb:null};
-    conv.msgs.push(um);
-    if(conv.title==='Yeni sohbet') conv.title=(text||'Görsel sorusu').replace(/\s+/g,' ').slice(0,48);
-    $('#input').value=''; live.typed=0; autoGrow(); clearAttach();
-    appendMsg(um); if(prev) rerender(prev); renderHeader();
-  }
-  const userIdx=conv.msgs.length-1;
-  const userContent=img?[{type:'text',text:text||'Bu görseli ayrıntılı açıkla.'},{type:'image_url',image_url:{url:img.dataUrl}}]:text;
-  const messages=[{role:'system',content:systemPrompt()},...contextFor(conv,userIdx),{role:'user',content:userContent}];
-
-  busy=true; live.controller=new AbortController(); setSendUI(); vibrate(8);
-  try{
-    if(mode==='all') await runCompare(conv,messages);
-    else if(mode==='auto') await runAuto(conv,messages);
-    else await runSingle(conv,P(mode),messages);
-  }finally{
-    busy=false; live.controller=null; setSendUI();
-    conv.updated=Date.now(); state.convs.sort((a,b)=>b.updated-a.updated);
-    save(); renderDrawer(); renderHeader();
-    const last=conv.msgs[conv.msgs.length-1];
-    if(last){ rerender(last); if(state.settings.autoSpeak&&state.currentId===conv.id) speak(answerOf(last)); }
-    vibrate(12);
-  }
-}
-
-async function streamInto(msg,p,messages,rootId){
-  const lp=live.prov[p.id];
-  lp.phase='wait'; lp.chars=0; lp.lastDelta=0; live.inflight++;
-  addUsage(p.id);
-  const rec={pid:p.id,ok:null,tok:0,ms:0,at:Date.now()};
-  state.recent.push(rec); if(state.recent.length>30) state.recent.splice(0,state.recent.length-30);
-  emitPacket(p.id,'out');
-  log('req',`→ ${p.name} · ${curModel(p)}`);
-  const t0=performance.now();
-  try{
-    const r=await callProvider(p,messages,{signal:live.controller?.signal,
-      onDelta:(full,d)=>{
-        msg.text=full; lp.phase='stream'; lp.chars=full.length; lp.lastDelta=Date.now();
-        live.rate.push([Date.now(),d.length]);
-        const n=performance.now(); if(n-lp.lastEmit>70){ lp.lastEmit=n; emitPacket(p.id,'in'); }
-        scheduleRender(rootId);
-      },
-      onThink:()=>{ if(lp.phase==='wait'){ lp.phase='think'; scheduleRender(rootId); } }});
-    const ms=Math.round(performance.now()-t0);
-    Object.assign(msg,{text:r.text,model:r.model,ms,tok:r.tok,pending:false,error:null,errorKind:null});
-    Object.assign(rec,{ok:true,tok:r.tok,ms});
-    state.stats.req++; state.stats.tok+=r.tok;
-    Object.assign(lp,{phase:'done',doneAt:Date.now(),lastMs:ms,errAt:0});
-    setBubble(p.id,fmtMs(ms).replace(' ',''),'ok');
-    live.rings.push({t0:performance.now(),color:p.color});
-    log('ok',`✓ ${p.name} · ${fmtMs(ms)} · ${r.tok} token`);
-    return {ok:true};
-  }catch(e){
-    const ms=Math.round(performance.now()-t0);
-    if(e.name==='AbortError'){
-      Object.assign(msg,{pending:false,stopped:true,ms});
-      Object.assign(rec,{ok:'stop',ms,tok:Math.ceil((msg.text||'').length/4)});
-      lp.phase='idle'; log('sys',`■ ${p.name} durduruldu`);
-      return {aborted:true};
-    }
-    Object.assign(msg,{pending:false,error:e.message,errorKind:e.kind||'http',ms});
-    Object.assign(rec,{ok:false,ms});
-    state.stats.err++; lp.phase='error'; lp.errAt=Date.now();
-    setBubble(p.id,e.kind==='rate'?'LIMIT':'HATA','err');
-    log('err',`✗ ${e.message}`);
-    if(e.kind==='model') refreshModels(p,{silent:true});
-    return {ok:false,hadText:!!msg.text};
-  }finally{
-    live.inflight=Math.max(0,live.inflight-1);
-    scheduleRender(rootId); saveSoon();
-  }
-}
-
-async function runSingle(conv,p,messages){
-  const m={id:uid(),role:'assistant',pid:p.id,model:curModel(p),text:'',pending:true};
-  conv.msgs.push(m); appendMsg(m);
-  const why=blocked(p);
-  if(why){ Object.assign(m,{pending:false,error:`${p.name}: ${why}.${why==='anahtar yok'?" Ayarlar'dan ekleyebilirsin.":''}`,errorKind:why==='anahtar yok'?'auth':'rate'}); rerender(m); return; }
-  await streamInto(m,p,messages,m.id);
+function pickJudge(ps){
+  const j=state.settings.judge;
+  if(j!=='auto'){ const p=ps.find(x=>x.id===j); if(p) return p; }
+  return ps.find(x=>x.id==='gemini')||ps.find(x=>x.id==='groq')||ps[0];
 }
 function autoOrder(){
   const now=Date.now();
@@ -698,11 +859,86 @@ function autoOrder(){
     .map(x=>({p:x.p,s:(avgLat(x.p.id)??(4000+x.i))+(now-(live.prov[x.p.id].errAt||0)<120000?1e6:0)}))
     .sort((a,b)=>a.s-b.s).map(x=>x.p);
 }
+
+async function send(textArg,opts={}){
+  if(busy) return;
+  if(testing){ toast('Bağlantı testi bitince tekrar dene'); return; }
+  const regenerate=!!opts.regenerate;
+  const text=String(textArg??input.value).trim();
+  const img=regenerate?opts.image:pendingImage;
+  if(!text&&!img) return;
+  if(!PROVIDERS.some(p=>state.keys[p.id])){ toast("Başlamak için Ayarlar'dan bir API anahtarı ekle"); openSheet(); return; }
+  if(img&&!state.keys.gemini){ toast('Görsel sormak için Gemini anahtarı gerekli'); return; }
+  const mode=img?'sohbet':(opts.mode||state.settings.mode);
+
+  let conv=currentConv(); if(!conv) conv=newConv(false);
+  let um;
+  if(!regenerate){
+    const prev=conv.msgs[conv.msgs.length-1];
+    um={id:uid(),role:'user',text,thumb:img?img.thumb:null,mode};
+    conv.msgs.push(um);
+    if(conv.title==='Yeni sohbet') conv.title=(text||'Görsel sorusu').replace(/\s+/g,' ').slice(0,48);
+    input.value=''; live.typed=0; autoGrow(); clearAttach();
+    appendMsg(um); if(prev) rerender(prev); renderHeader();
+  }else um=conv.msgs[conv.msgs.length-1];
+
+  busy=true; live.controller=new AbortController(); live.stagePill=null; setSendUI(); vibrate(8);
+  try{
+    let prompt=um.healed||um.text;
+    if(!regenerate&&state.settings.heal&&!img&&text.length>=12){
+      um.healing=true; rerender(um);
+      const h=await healPrompt(um,mode);
+      um.healing=false; delete um.healPreview;
+      if(live.controller.signal.aborted){ rerender(um); return; }
+      if(h){ um.healed=h; prompt=h; } else um.healFail=true;
+      rerender(um);
+    }
+    if(mode==='sirket') await runCompany(conv,prompt);
+    else if(mode==='munazara') await runDebate(conv,prompt);
+    else if(mode==='bant') await runPipeline(conv,prompt);
+    else{
+      const userIdx=conv.msgs.indexOf(um);
+      const content=img?[{type:'text',text:prompt||'Bu görseli ayrıntılı açıkla.'},{type:'image_url',image_url:{url:img.dataUrl}}]:prompt;
+      const messages=[{role:'system',content:systemPrompt()},...contextFor(conv,userIdx),{role:'user',content}];
+      const t=state.settings.target;
+      if(img) await runSingle(conv,P('gemini'),messages);
+      else if(t==='all') await runCompare(conv,messages);
+      else if(t==='auto') await runAuto(conv,messages);
+      else await runSingle(conv,P(t),messages);
+    }
+  }finally{
+    busy=false; live.controller=null; setSendUI();
+    conv.updated=Date.now(); state.convs.sort((a,b)=>b.updated-a.updated);
+    save(); renderDrawer(); renderHeader();
+    const last=conv.msgs[conv.msgs.length-1];
+    if(last){ rerender(last); if(um!==last) rerender(um); if(state.settings.autoSpeak&&state.currentId===conv.id) speak(answerOf(last)); }
+    vibrate(12);
+  }
+}
+async function healPrompt(um,mode){
+  const p=autoOrder()[0]; if(!p) return null;
+  const model=p.id==='groq'&&modelList(p).includes('openai/gpt-oss-20b')?'openai/gpt-oss-20b':undefined;
+  const o={id:uid(),pid:p.id,text:'',pending:true};
+  const r=await streamInto(o,p,[{role:'system',content:SYS_HEAL+(HEAL_HINT[mode]||'')},{role:'user',content:um.text}],um.id,{model,timeout:25000,hook:full=>{um.healPreview=full;}});
+  if(!r.ok) return null;
+  const h=o.text.trim().replace(/^```[a-z]*\n?|```$/gi,'').replace(/^(iyileştirilmiş istem|istem)\s*:\s*/i,'').replace(/^["“'«]+|["”'»]+$/g,'').trim();
+  if(h.length<8||h==='(boş yanıt)') return null;
+  return h.slice(0,1500);
+}
+
+/* ---------- sohbet modu ---------- */
+async function runSingle(conv,p,messages){
+  const m={id:uid(),role:'assistant',pid:p.id,model:curModel(p),text:'',pending:true};
+  conv.msgs.push(m); appendMsg(m);
+  const why=blocked(p);
+  if(why){ Object.assign(m,{pending:false,error:`${p.name}: ${why}.${why==='anahtar yok'?" Ayarlar'dan ekleyebilirsin.":''}`,errorKind:why==='anahtar yok'?'auth':'rate'}); rerender(m); return; }
+  await streamInto(m,p,messages,m.id);
+}
 async function runAuto(conv,messages){
   const cands=autoOrder();
   const m={id:uid(),role:'assistant',pid:(cands[0]||PROVIDERS[0]).id,model:'',text:'',pending:true,tried:[]};
   conv.msgs.push(m); appendMsg(m);
-  if(!cands.length){ Object.assign(m,{pending:false,error:'Şu an kullanılabilir sağlayıcı yok (anahtar, limit ya da bekleme süresi). Ayarlar\'ı kontrol et veya biraz sonra dene.',errorKind:'rate'}); rerender(m); return; }
+  if(!cands.length){ Object.assign(m,{pending:false,error:"Şu an kullanılabilir sağlayıcı yok (anahtar, limit ya da bekleme süresi). Ayarlar'ı kontrol et veya biraz sonra dene.",errorKind:'rate'}); rerender(m); return; }
   for(const p of cands){
     Object.assign(m,{pid:p.id,model:curModel(p),text:'',pending:true,error:null}); m.tried.push(p.id); rerender(m);
     const r=await streamInto(m,p,messages,m.id);
@@ -719,14 +955,241 @@ async function runCompare(conv,messages){
   m.items.filter(i=>!i.error&&!i.stopped&&i.text).sort((a,b)=>a.ms-b.ms).forEach((it,k)=>{ if(k<3) it.medal=k; });
   rerender(m);
 }
+
+/* ---------- çok adımlı çalışmalar için ortak ---------- */
+function stepSet(m,key,patch){ let s=m.steps.find(x=>x.key===key); if(!s){ s={key,label:key,status:'wait'}; m.steps.push(s);} Object.assign(s,patch); scheduleRender(m.id); return s; }
+function runEnd(m,phase,error){
+  m.pending=false; m.phase=phase; m.ms=Date.now()-m.t0;
+  m.steps.forEach(s=>{ if(s.status==='run') s.status=phase==='stop'?'stop':'err'; });
+  if(error) m.error=error;
+  if(phase==='stop') m.stopped=true;
+  scheduleRender(m.id);
+}
+const runFail=(m,e)=>runEnd(m,'err',e);
+const runStop=m=>runEnd(m,'stop');
+function runDone(m){
+  runEnd(m,'done');
+  if(m.role==='company') live.stagePill={id:m.id,text:'Raporu gör'};
+  if(m.role==='pipeline') live.stagePill={id:m.id,text:'Sonucu gör'};
+}
+
+/* ---------- mod: mikro-ajan şirketi ---------- */
+function normRoster(arr,N){
+  if(!Array.isArray(arr)) return [];
+  return arr.filter(x=>x&&typeof x==='object'&&(x.rol||x.role)).slice(0,N).map(x=>({
+    ad:trunc(String(x.ad||x.isim||x.name||'Ajan').trim(),16),
+    rol:trunc(String(x.rol||x.role||'').trim(),42),
+    neden:trunc(String(x.neden||x.gerekce||'').trim(),140),
+    tutum:trunc(String(x.tutum||x.tavir||'').trim(),80)}));
+}
+function normType(t){
+  t=String(t||'').toLowerCase();
+  if(/ele[sş]tir|critic/.test(t)) return 'eleştiri';
+  if(/geli[sş]tir|improv|build/.test(t)) return 'geliştirme';
+  if(/soru|quest/.test(t)) return 'soru';
+  if(/destek|support|kat[ıi]l/.test(t)) return 'destek';
+  return 'fikir';
+}
+function parseLine(line){
+  const s=String(line||'').trim(); if(!s||s.startsWith('```')) return null;
+  const a=s.indexOf('{'), b=s.lastIndexOf('}'); if(a<0||b<=a) return null;
+  try{ return JSON.parse(s.slice(a,b+1)); }catch{}
+  try{ return JSON.parse(s.slice(a,b+1).replace(/,\s*([}\]])/g,'$1')); }catch{}
+  return null;
+}
+function addEvent(m,o,round,team){
+  const n=m.roster.length;
+  const from=parseInt(String(o.from??o.kimden??'').replace(/\D/g,''),10);
+  if(!(from>=1&&from<=n)) return;
+  if(m.roster[from-1].team!==team) return;               // her model yalnızca kendi ekibi adına konuşur
+  let to=parseInt(String(o.to??o.kime??'0').replace(/\D/g,''),10);
+  if(!(to>=1&&to<=n)||to===from) to=0;
+  const text=String(o.text??o.mesaj??'').trim().slice(0,320); if(!text) return;
+  const tags=(Array.isArray(o.tags)?o.tags:Array.isArray(o.etiketler)?o.etiketler:[]).map(t=>String(t).toLowerCase().replace(/^#/,'').trim().slice(0,28)).filter(Boolean).slice(0,3);
+  const ev={i:from-1,to:to?to-1:-1,type:normType(o.type??o.tur),text,tags,round,t:Date.now()-m.t0};
+  m.events.push(ev);
+  if(live.co&&live.co.msgId===m.id) coEvent(ev,true);
+  scheduleRender(m.id);
+}
+function digest(m,round,max=7000){
+  const lines=m.events.filter(e=>e.round===round).map(e=>`${e.i+1}. ${m.roster[e.i].ad} → ${e.to>=0?m.roster[e.to].ad:'herkes'} [${e.type}]: ${e.text}`);
+  let out=lines.join('\n'); if(out.length>max) out=out.slice(out.length-max);
+  return out||'(mesaj yok)';
+}
+function rosterLines(list){ return list.map(a=>`${a.id}. ${a.ad} — ${a.rol}${a.tutum?` (tutum: ${a.tutum})`:''}`).join('\n'); }
+function meetingFormat(first){ return `Her satır tam olarak şu biçimde olsun:\n{"from":${first},"to":0,"type":"fikir","text":"...","tags":["kavram"]}\n"type" şunlardan biri: fikir, eleştiri, geliştirme, soru, destek.`; }
+async function teamRound(m,t,round){
+  const p=P(m.teams[t]); const mine=m.roster.filter(a=>a.team===t); if(!mine.length) return {ok:true};
+  const others=m.roster.filter(a=>a.team!==t);
+  const M=round===1?Math.min(14,Math.max(4,mine.length*2)):Math.min(10,Math.max(3,mine.length+1));
+  const user=round===1
+    ?`Görev: """${m.task}"""\nGörev analizi: ${m.analiz||'-'}\n\nSenin canlandırdığın kişiler (yalnızca bunlar adına konuş):\n${rosterLines(mine)}\n\nToplantıdaki diğer kişiler (onlara hitap edebilirsin):\n${others.length?rosterLines(others):'-'}\n\nKurallar:\n- Toplam ${M} mesaj yaz; mesajları kişilerin arasında dengeli dağıt.\n- Her mesaj en fazla 25 kelime; somut ve kişinin uzmanlığından olsun.\n- Kişiler birbirine cevap versin: fikir öner, eleştir, geliştir, soru sor, destekle.\n- "to": hedef kişinin numarası; herkese sesleniyorsa 0.\n- "tags": mesajın değindiği 1-2 kısa kavram (küçük harf, 1-3 kelime). Aynı kavram için hep aynı ifadeyi kullan.\n- Görev hangi dildeyse o dilde yaz.\n\n${meetingFormat(mine[0].id)}`
+    :`Görev: """${m.task}"""\n\nBirinci turda konuşulanlar:\n${digest(m,1)}\n\nŞimdi ikinci tur. Senin canlandırdığın kişiler (yalnızca bunlar adına konuş):\n${rosterLines(mine)}\n\nKurallar:\n- Toplam ${M} mesaj yaz.\n- Diğer ekiplerin fikirlerini değerlendir: zayıf noktaları eleştir, güçlü fikirleri birleştirip geliştir, ekibi en güçlü çözüm etrafında uzlaşmaya yaklaştır.\n- "to" alanında diğer ekiplerden kişileri de hedefleyebilirsin; herkese ise 0.\n- Kavram etiketlerinde birinci turdaki ifadeleri tekrar kullan.\n\n${meetingFormat(mine[0].id)}`;
+  const o={id:uid(),pid:p.id,text:'',pending:true}; m.reqs++;
+  let parsed=0;
+  const eat=chunk=>chunk.split('\n').forEach(line=>{ const ob=parseLine(line); if(ob) addEvent(m,ob,round,t); });
+  const r=await streamInto(o,p,[{role:'system',content:SYS_MEETING},{role:'user',content:user}],m.id,{timeout:90000,
+    hook:full=>{ const nl=full.lastIndexOf('\n'); if(nl>=parsed){ eat(full.slice(parsed,nl)); parsed=nl+1; } }});
+  if(o.text&&o.text!=='(boş yanıt)'&&parsed<o.text.length) eat(o.text.slice(parsed));
+  return r;
+}
+async function runCompany(conv,task){
+  const ps=autoOrder();
+  const N=+state.settings.agents||12;
+  const m={id:uid(),role:'company',task,n:N,roster:[],teams:[],analiz:'',degisiklik:'',events:[],report:'',phase:'kadro',reqs:0,t0:Date.now(),pending:true,
+    steps:[{key:'kadro',label:'Kadro araştırması',status:'wait'},{key:'denetim',label:'Kadro denetimi',status:'wait'},{key:'tur1',label:'1. tur',status:'wait'},{key:'tur2',label:'2. tur',status:'wait'},{key:'rapor',label:'Konsensüs',status:'wait'}]};
+  conv.msgs.push(m); appendMsg(m);
+  if(!ps.length) return runFail(m,"Kullanılabilir sağlayıcı yok. Ayarlar'dan anahtar ekle ya da limitin dolmasını bekle.");
+  live.co=coBuild(m); setView('company'); setMax(true);
+  const sig=live.controller.signal;
+  // 1) kadro araştırması
+  const planner=ps[0];
+  let st=stepSet(m,'kadro',{status:'run',pid:planner.id});
+  let r=await jsonCall(m,planner,[{role:'system',content:SYS_PLANNER},{role:'user',content:`Görev: """${task}"""\n\nTam ${N} kişilik ekibi kur. Ekipte en az bir şüpheci/eleştirel ses ve görevden doğrudan etkilenen bir paydaş bulunsun. Görev hangi dildeyse o dili kullan. SADECE şu JSON'u yaz:\n{"analiz":"görevin özü ve çözüm için gerekenler (en fazla 2 cümle)","roller":[${ROLE_SHAPE}]}`}],{step:st,timeout:45000});
+  if(r.aborted) return runStop(m);
+  let roster=r.data?normRoster(r.data.roller,N):[];
+  if(r.error||roster.length<3){ stepSet(m,'kadro',{status:'err'}); return runFail(m,r.error||'Kadro üretilemedi (geçersiz biçim). Tekrar dene.'); }
+  m.analiz=trunc(String(r.data.analiz||''),400);
+  stepSet(m,'kadro',{status:'ok',ms:r.ms});
+  // 2) kadro denetimi ve tayin
+  const auditor=ps[1]||ps[0];
+  m.phase='denetim'; st=stepSet(m,'denetim',{status:'run',pid:auditor.id});
+  r=await jsonCall(m,auditor,[{role:'system',content:SYS_AUDITOR},{role:'user',content:`Görev: """${task}"""\nAnaliz: ${m.analiz}\n\nÖnerilen ekip:\n${JSON.stringify(roster)}\n\nEkibi bu görev açısından değerlendir: kritik eksik bir uzmanlık veya bakış açısı varsa ekle, gereksiz ya da birbirini tekrar eden rolleri çıkar veya değiştir. Son kadro tam ${N} kişi olsun. SADECE şu JSON'u yaz:\n{"degisiklik":"yaptığın değişikliklerin kısa özeti (en fazla 20 kelime; gerek yoksa 'Değişiklik gerekmedi')","roller":[${ROLE_SHAPE}]}`}],{step:st,timeout:45000});
+  if(r.aborted) return runStop(m);
+  const audited=r.data?normRoster(r.data.roller,N):[];
+  if(!r.error&&audited.length>=3){ roster=audited; m.degisiklik=trunc(String(r.data.degisiklik||''),240); stepSet(m,'denetim',{status:'ok',ms:r.ms}); }
+  else stepSet(m,'denetim',{status:'err',info:'ilk kadro kullanıldı'});
+  // ekiplere dağıt: her ekip farklı bir model
+  const k=Math.min(3,ps.length);
+  roster.forEach((a,i)=>{ a.id=i+1; a.team=i%k; a.pid=ps[a.team].id; });
+  m.roster=roster; m.teams=ps.slice(0,k).map(p=>p.id);
+  if(live.co&&live.co.msgId===m.id) coSyncRoster(live.co);
+  scheduleRender(m.id);
+  // 3) birinci tur
+  m.phase='tur1'; stepSet(m,'tur1',{status:'run'});
+  await Promise.all(m.teams.map((pid,t)=>teamRound(m,t,1)));
+  if(sig.aborted) return runStop(m);
+  const n1=m.events.filter(e=>e.round===1).length;
+  stepSet(m,'tur1',{status:n1?'ok':'err',info:n1+' mesaj'});
+  if(!n1) return runFail(m,'Ajanlar konuşamadı: modeller beklenen biçimde yanıt vermedi. Tekrar dene.');
+  // 4) ikinci tur: çapraz eleştiri
+  m.phase='tur2'; stepSet(m,'tur2',{status:'run'});
+  await Promise.all(m.teams.map((pid,t)=>teamRound(m,t,2)));
+  if(sig.aborted) return runStop(m);
+  const n2=m.events.filter(e=>e.round===2).length;
+  stepSet(m,'tur2',{status:n2?'ok':'err',info:n2+' mesaj'});
+  // 5) konsensüs raporu
+  const judge=pickJudge(ps);
+  m.phase='rapor'; st=stepSet(m,'rapor',{status:'run',pid:judge.id});
+  const o={id:uid(),pid:judge.id,text:'',pending:true}; m.reqs++;
+  const rr=await streamInto(o,judge,[{role:'system',content:SYS_MODERATOR},{role:'user',content:`Görev: """${task}"""\n\nEkip:\n${rosterLines(m.roster)}\n\nToplantı dökümü (1. tur):\n${digest(m,1,6000)}\n\nToplantı dökümü (2. tur):\n${digest(m,2,4000)}\n\nMarkdown biçiminde konsensüs raporu yaz:\n## Konsensüs\n(ekibin vardığı ana sonuç ya da seçilen fikir; 2-4 cümle)\n## Neden bu?\n## Öne çıkan alternatifler\n## İtirazlar ve riskler\n## Sonraki adımlar\n(numaralı, somut adımlar)\n\nKatkıları kişilerin adıyla kısaca belirt. Görev hangi dildeyse o dilde yaz. ${lenSys()} ${personaSys()}`}],m.id,{timeout:120000,hook:full=>{m.report=full;st.chars=full.length;}});
+  if(rr.aborted){ m.report=o.text; return runStop(m); }
+  if(!rr.ok){ stepSet(m,'rapor',{status:'err'}); return runFail(m,o.error); }
+  m.report=o.text; m.reportPid=judge.id; m.reportModel=o.model;
+  stepSet(m,'rapor',{status:'ok',ms:o.ms});
+  runDone(m);
+}
+
+/* ---------- mod: münazara ---------- */
+const num=x=>clamp(Number(x)||0,0,10);
+async function runDebate(conv,q){
+  const ps=autoOrder();
+  if(ps.length<2){ const m={id:uid(),role:'assistant',pid:(ps[0]||PROVIDERS[0]).id,model:'',text:'',error:'Münazara için en az 2 kullanılabilir sağlayıcı gerekli. Ayarlar\'dan başka bir anahtar ekle.',errorKind:'auth'}; conv.msgs.push(m); appendMsg(m); return; }
+  const judge=pickJudge(ps);
+  const letters=['A','B','C'].slice(0,ps.length).sort(()=>Math.random()-.5);
+  const m={id:uid(),role:'debate',q,judge:judge.id,reqs:0,t0:Date.now(),pending:true,phase:'cevap',scores:null,winner:null,reason:'',final:'',
+    items:ps.map((p,i)=>({id:uid(),pid:p.id,model:curModel(p),letter:letters[i],text:'',pending:true,critique:''})),
+    steps:[{key:'cevap',label:'Cevaplar',status:'run'},{key:'elestiri',label:'Çapraz eleştiri',status:'wait'},{key:'hakem',label:'Hakem',status:'wait',pid:judge.id},{key:'sentez',label:'Nihai cevap',status:'wait',pid:judge.id}]};
+  conv.msgs.push(m); appendMsg(m); setView('office');
+  const sig=live.controller.signal, sys=systemPromptBase();
+  await Promise.all(m.items.map(it=>{ m.reqs++; return streamInto(it,P(it.pid),[{role:'system',content:sys},{role:'user',content:q}],m.id,{timeout:120000}); }));
+  if(sig.aborted) return runStop(m);
+  const ok=m.items.filter(i=>i.text&&!i.error);
+  stepSet(m,'cevap',{status:ok.length?'ok':'err',info:`${ok.length}/${m.items.length}`});
+  if(ok.length<2){ if(ok.length===1){ m.final=ok[0].text; m.winner=ok[0].letter; } return runFail(m,ok.length?'Sadece bir model cevap verdi; münazara yapılamadı.':'Hiçbir model cevap veremedi.'); }
+  // çapraz eleştiri
+  m.phase='elestiri'; stepSet(m,'elestiri',{status:'run'});
+  await Promise.all(ok.map(it=>{
+    const o={id:uid(),pid:it.pid,text:'',pending:true}; m.reqs++;
+    const others=ok.filter(x=>x!==it);
+    return streamInto(o,P(it.pid),[{role:'system',content:SYS_CRITIC},{role:'user',content:`Soru: """${q}"""\n\nSenin cevabın (Cevap ${it.letter}):\n"""${clip(it.text,3500)}"""\n\nRakip cevaplar:\n${others.map(x=>`Cevap ${x.letter}:\n"""${clip(x.text,3500)}"""`).join('\n\n')}\n\nRakip cevaplardaki hataları, eksikleri ve zayıf noktaları en fazla 5 kısa maddede yaz. Rakiplerde senin cevabında olmayan güçlü bir nokta varsa onu da dürüstçe belirt. Sadece maddeleri yaz.`}],m.id,{timeout:90000,hook:full=>{it.critique=full;}})
+      .then(r=>{ it.critique=r.ok?o.text:''; });
+  }));
+  if(sig.aborted) return runStop(m);
+  stepSet(m,'elestiri',{status:'ok'});
+  // hakem: isimsiz puanlama
+  m.phase='hakem'; let st=stepSet(m,'hakem',{status:'run'});
+  const jr=await jsonCall(m,judge,[{role:'system',content:SYS_JUDGE},{role:'user',content:`Soru: """${q}"""\n\n${ok.map(it=>`Cevap ${it.letter}:\n"""${clip(it.text,4000)}"""${it.critique?`\nCevap ${it.letter}'nin yazarının rakiplerine yaptığı eleştiriler:\n${clip(it.critique,1200)}`:''}`).join('\n\n')}\n\nHer cevabı 0-10 arası doğruluk, eksiksizlik ve netlik açısından puanla. Eleştirileri yalnızca kanıt olarak kullan; haklı olup olmadıklarını kendin değerlendir. SADECE şu JSON'u yaz:\n{"puanlar":{${ok.map(it=>`"${it.letter}":{"dogruluk":0,"eksiksizlik":0,"netlik":0,"yorum":"en fazla 15 kelime"}`).join(',')}},"kazanan":"harf","gerekce":"en fazla 3 cümle"}`}],{step:st,timeout:60000});
+  if(jr.aborted) return runStop(m);
+  if(jr.error||!jr.data||!jr.data.puanlar){ stepSet(m,'hakem',{status:'err'}); }
+  else{
+    m.scores={};
+    ok.forEach(it=>{ const s=jr.data.puanlar[it.letter]||{}; const d=num(s.dogruluk),e=num(s.eksiksizlik),n=num(s.netlik); m.scores[it.letter]={d,e,n,t:Math.round((d+e+n)/3*10)/10,yorum:trunc(String(s.yorum||''),160)}; });
+    let w=String(jr.data.kazanan||'').trim().toUpperCase().slice(0,1);
+    const ranked=Object.entries(m.scores).sort((a,b)=>b[1].t-a[1].t);
+    if(!m.scores[w]) w=ranked[0][0];
+    m.winner=w; m.reason=trunc(String(jr.data.gerekce||''),600);
+    ranked.forEach(([L],k)=>{ const it=m.items.find(x=>x.letter===L); if(it&&k<3) it.medal=k; });
+    stepSet(m,'hakem',{status:'ok',ms:jr.ms});
+  }
+  // nihai sentez
+  m.phase='sentez'; st=stepSet(m,'sentez',{status:'run'});
+  const fo={id:uid(),pid:judge.id,text:'',pending:true}; m.reqs++;
+  const fr=await streamInto(fo,judge,[{role:'system',content:sys},{role:'user',content:`Soru: """${q}"""\n\n${ok.map(it=>`Cevap ${it.letter}${m.scores?.[it.letter]?` (hakem puanı ${m.scores[it.letter].t}/10)`:''}:\n"""${clip(it.text,4000)}"""`).join('\n\n')}${m.reason?`\n\nHakemin gerekçesi: ${m.reason}`:''}\n\nBu cevapların en doğru ve en güçlü kısımlarını birleştirip, eleştirilerde ortaya çıkan hataları düzelterek tek bir nihai cevap yaz. Doğrudan cevabı yaz; cevaplardan, harflerden veya hakemden bahsetme.`}],m.id,{timeout:120000,hook:full=>{m.final=full;st.chars=full.length;}});
+  if(fr.aborted){ m.final=fo.text; return runStop(m); }
+  if(!fr.ok){ stepSet(m,'sentez',{status:'err'}); const wi=m.items.find(x=>x.letter===m.winner); m.final=wi?wi.text:''; m.finalNote='Birleştirme yapılamadı; kazanan cevap gösteriliyor.'; }
+  else{ m.final=fo.text; stepSet(m,'sentez',{status:'ok',ms:fo.ms}); }
+  runDone(m);
+}
+
+/* ---------- mod: üretim bandı ---------- */
+async function runPipeline(conv,task){
+  const ps=autoOrder();
+  const m={id:uid(),role:'pipeline',task,stations:[],reqs:0,t0:Date.now(),pending:true,phase:'plan',final:'',
+    steps:[{key:'plan',label:'Bant tasarımı',status:'run',pid:ps[0]?.id}]};
+  conv.msgs.push(m); appendMsg(m);
+  if(!ps.length) return runFail(m,'Kullanılabilir sağlayıcı yok.');
+  live.pl=m; live.plMove=null; setView('pipeline');
+  const r=await jsonCall(m,ps[0],[{role:'system',content:SYS_PIPE},{role:'user',content:`Görev: """${task}"""\n\nBu görev için 3-5 aşamalı, sıralı bir üretim bandı tasarla. Aşamalar tamamen bu göreve özel olsun; her aşama bir öncekinin çıktısını alıp ilerletir ve son aşamanın çıktısı kullanıcıya verilecek nihai sonuçtur. SADECE şu JSON'u yaz:\n{"istasyonlar":[{"ad":"en fazla 3 kelime","gorev":"bu aşamada yapılacak iş (en fazla 25 kelime)"}]}`}],{step:m.steps[0],timeout:45000});
+  if(r.aborted) return runStop(m);
+  const arr=r.data&&Array.isArray(r.data.istasyonlar)?r.data.istasyonlar.filter(x=>x&&typeof x==='object'):null;
+  if(r.error||!arr||!arr.length){ stepSet(m,'plan',{status:'err'}); return runFail(m,r.error||'Bant tasarlanamadı. Tekrar dene.'); }
+  stepSet(m,'plan',{status:'ok',ms:r.ms});
+  m.stations=arr.slice(0,5).map((s,i)=>({id:uid(),ad:trunc(String(s.ad||`Aşama ${i+1}`),32),gorev:trunc(String(s.gorev||''),300),pid:ps[(i+1)%ps.length].id,model:'',text:'',status:'wait'}));
+  m.phase='run'; scheduleRender(m.id);
+  let prev='';
+  const n=m.stations.length;
+  for(let i=0;i<n;i++){
+    const s=m.stations[i];
+    if(i>0) live.plMove={from:i-1,to:i,t0:performance.now()};
+    let p=P(s.pid), attempt=0, res;
+    for(;;){
+      Object.assign(s,{status:'run',pid:p.id,model:curModel(p),text:'',error:null,pending:true}); m.reqs++;
+      scheduleRender(m.id);
+      res=await streamInto(s,p,[{role:'system',content:systemPromptBase()},{role:'user',content:`Ana görev: """${m.task}"""\n\nÜretim bandının ${i+1}/${n}. istasyonusun: ${s.ad}.\nBu istasyondaki görevin: ${s.gorev}\n${prev?`\nÖnceki istasyonun çıktısı:\n"""${clip(prev,7000)}"""\n`:''}\n${i===n-1?`Sen son istasyonsun: kullanıcıya sunulacak nihai, eksiksiz ve kullanıma hazır sonucu üret. ${lenSys()}`:'Sadece bu istasyonun çıktısını üret; bir sonraki istasyon bunu kullanacak. Gereksiz açıklama yapma.'}`}],m.id,{timeout:150000});
+      if(res.aborted||res.ok) break;
+      const alt=autoOrder().find(x=>x.id!==p.id);
+      if(attempt>=1||!alt) break;
+      attempt++; s.retried=true; log('sys',`${s.ad}: ${p.name} başarısız, ${alt.name} ile yeniden deneniyor`); p=alt;
+    }
+    if(res.aborted){ s.status='stop'; return runStop(m); }
+    if(!res.ok){ s.status='err'; return runFail(m,`${i+1}. istasyon (${s.ad}) tamamlanamadı: ${s.error||'hata'}`); }
+    s.status='ok'; prev=s.text; scheduleRender(m.id);
+  }
+  live.plMove={from:n-1,to:n,t0:performance.now()};
+  m.final=prev; runDone(m);
+}
+
 function stopAll(){ live.controller?.abort(); }
-function regenerate(){
+function regenerate(useOriginal=false){
   if(busy) return;
   const conv=currentConv(); if(!conv) return;
   let i=conv.msgs.length-1; while(i>=0&&conv.msgs[i].role!=='user') i--;
   if(i<0) return;
-  const u=conv.msgs[i]; conv.msgs.length=i+1; renderChat();
-  send(u.text,{regenerate:true,image:u.thumb?{dataUrl:u.thumb,thumb:u.thumb}:null});
+  const u=conv.msgs[i];
+  if(useOriginal){ delete u.healed; delete u.healFail; }
+  conv.msgs.length=i+1; renderChat();
+  send(u.text,{regenerate:true,mode:u.mode||'sohbet',image:u.thumb?{dataUrl:u.thumb,thumb:u.thumb}:null});
 }
 
 /* =====================================================================
@@ -745,7 +1208,7 @@ function mdText(seg){
   const closeList=()=>{ if(list){ html+=`</${list}>`; list=null; } };
   const flushTable=()=>{
     if(!table.length) return;
-    const rows=table.filter(r=>!/^\|?\s*:?-{2,}/.test(r.replace(/\s/g,'')));
+    const rows=table.filter(r=>!/^\|?:?-{2,}/.test(r.replace(/\s/g,'')));
     const cells=r=>r.replace(/^\||\|$/g,'').split('|').map(c=>fmtInline(c.trim()));
     html+='<div class="tbl"><table>'+rows.map((r,i)=>'<tr>'+cells(r).map(c=>i===0?`<th>${c}</th>`:`<td>${c}</td>`).join('')+'</tr>').join('')+'</table></div>';
     table=[];
@@ -784,21 +1247,25 @@ function plain(s){ return String(s||'').replace(/```[\s\S]*?```/g,' (kod bloğu)
    SOHBET GÖRÜNÜMÜ
    ===================================================================== */
 const chat=$('#chat');
-function renderAll(){ renderHeader(); renderChat(); renderDrawer(); renderTools(); }
+const openSet=new Set(), closedSet=new Set();
+const isOpen=(id,def)=>openSet.has(id)?true:closedSet.has(id)?false:def;
+function renderAll(){ renderHeader(); renderChat(); renderDrawer(); renderTools(); loadStageForConv(); }
 function renderHeader(){
   const c=currentConv();
   $('#convTitle').textContent=c&&c.msgs.length?c.title:'AI Hub';
   const n=PROVIDERS.filter(p=>state.keys[p.id]).length;
-  $('#convSub').textContent=c&&c.msgs.length?`${c.msgs.filter(m=>m.role==='user').length} soru · ${ago(c.updated)}`:`${n} yapay zekâ bağlı`;
+  $('#convSub').textContent=c&&c.msgs.length?`${c.msgs.filter(m=>m.role==='user').length} görev · ${ago(c.updated)}`:`${n} yapay zekâ bağlı · ${MODES[state.settings.mode].label} modu`;
 }
 function greet(){ const h=new Date().getHours(); return h<6?'İyi geceler':h<12?'Günaydın':h<18?'İyi günler':'İyi akşamlar'; }
 function emptyEl(){
   const hasKey=PROVIDERS.some(p=>state.keys[p.id]);
+  const mi=MODE_INFO[state.settings.mode]||MODE_INFO.sohbet;
+  const k=PROVIDERS.filter(p=>!blocked(p)).length;
   const d=document.createElement('div'); d.className='empty';
-  d.innerHTML=`<div class="empty-logo">✦</div><h2>${greet()}, ne sormak istersin?</h2>
-    <p>${hasKey?'Groq, Gemini ve OpenRouter tek ekranda. Hedefi “Hepsi” yaparsan cevaplar yarışır, en hızlısı madalya alır.':'Başlamak için ücretsiz bir API anahtarı ekle. Anahtarlar ve sohbetler yalnızca bu cihazda saklanır.'}</p>
-    ${hasKey?'':`<button class="cta" data-act="settings">${ic('sliders')} Anahtar ekle</button>`}
-    <div class="quick">${QUICK.map((q,i)=>`<button data-act="quick" data-i="${i}"><b>${ic(q.icon)}${q.title}</b><small>${esc(q.text.trim())}</small></button>`).join('')}</div>`;
+  d.innerHTML=`<div class="empty-logo">${ic(mi.icon)}</div><h2>${esc(mi.title(greet()))}</h2>
+    <p>${hasKey?mi.desc:'Başlamak için ücretsiz bir API anahtarı ekle. Anahtarlar ve sohbetler yalnızca bu cihazda saklanır.'}</p>
+    ${hasKey?`<div class="cost">${mi.cost(k)}</div>`:`<button class="cta" data-act="settings">${ic('sliders')} Anahtar ekle</button>`}
+    <div class="quick">${mi.quick.map((q,i)=>`<button data-act="quick" data-i="${i}"><b>${ic(q.icon)}${esc(q.title)}</b><small>${esc(q.text.trim())}</small></button>`).join('')}</div>`;
   return d;
 }
 function renderChat(){
@@ -810,25 +1277,36 @@ function renderChat(){
 }
 function msgEl(m){ const el=document.createElement('div'); el.dataset.id=m.id; fillMsg(el,m); return el; }
 function isLast(m){ const c=currentConv(); return !!c&&c.msgs[c.msgs.length-1]===m; }
+function isLastUser(m){ const c=currentConv(); if(!c) return false; for(let i=c.msgs.length-1;i>=0;i--) if(c.msgs[i].role==='user') return c.msgs[i]===m; return false; }
+function actBtn(act,label,id,icon){ return `<button class="act" data-act="${act}" data-id="${id}" title="${label}">${ic(icon)}<span>${label}</span></button>`; }
 function fillMsg(el,m){
+  const last=isLast(m);
   if(m.role==='user'){
     el.className='msg user';
-    el.innerHTML=(m.thumb?`<img class="thumb" src="${m.thumb}" alt="Gönderilen görsel">`:'')+(m.text?`<div class="utext">${esc(m.text)}</div>`:'');
+    let heal='';
+    if(m.healing) heal=`<div class="healed"><b>${ic('wand')} İstem iyileştiriliyor…</b>${m.healPreview?esc(m.healPreview):''}</div>`;
+    else if(m.healed) heal=`<details class="healed" id="h-${m.id}" ${isOpen('h-'+m.id,false)?'open':''}><summary>${ic('wand')} İyileştirilmiş istem kullanıldı</summary>${esc(m.healed)}${isLastUser(m)&&!busy?`<div>${actBtn('orig','Orijinalle tekrar sor',m.id,'refresh')}</div>`:''}</details>`;
+    else if(m.healFail) heal='<div class="healed">İstem iyileştirilemedi, orijinali kullanıldı.</div>';
+    const mode=m.mode&&m.mode!=='sohbet'?`<div class="umode">${ic(MODES[m.mode].icon)}${MODES[m.mode].label}</div>`:'';
+    el.innerHTML=mode+(m.thumb?`<img class="thumb" src="${m.thumb}" alt="Gönderilen görsel">`:'')+(m.text?`<div class="utext">${esc(m.text)}</div>`:'')+heal;
     return;
   }
-  const last=isLast(m);
   if(m.role==='assistant'){ el.className='msg'+(m.error?' is-err':''); el.innerHTML=cardHTML(m,{root:m.id,last}); return; }
   if(m.role==='compare'){
     const done=m.items.every(i=>!i.pending);
     el.className='msg compare';
     el.innerHTML=`<div class="cmp-head">${ic('layers')}<span>Karşılaştırma · ${m.items.length} model</span>${done&&last&&!busy?`<button class="act" data-act="regen" data-id="${m.id}">${ic('refresh')}<span>Yeniden</span></button>`:''}</div>`
       +m.items.map(it=>`<div class="${it.error?'is-err':''}">${cardHTML(it,{root:m.id,inCmp:true})}</div>`).join('');
+    return;
   }
+  el.className='msg';
+  if(m.role==='company') el.innerHTML=companyHTML(m,last);
+  else if(m.role==='debate') el.innerHTML=debateHTML(m,last);
+  else if(m.role==='pipeline') el.innerHTML=pipelineHTML(m,last);
 }
-function actBtn(act,label,id,icon){ return `<button class="act" data-act="${act}" data-id="${id}" title="${label}">${ic(icon)}<span>${label}</span></button>`; }
 function cardHTML(m,{root,last,inCmp}){
   const p=P(m.pid)||{name:'Asistan',color:'#a78bfa'};
-  const medal=m.medal!=null?`<span class="medal" title="${m.medal+1}. en hızlı">${['🥇','🥈','🥉'][m.medal]}</span>`:'';
+  const medal=m.medal!=null?`<span class="medal" title="${m.medal+1}. sıra">${['🥇','🥈','🥉'][m.medal]}</span>`:'';
   const ms=!m.pending&&!m.error&&m.ms!=null?`<span class="ms">${fmtMs(m.ms)}</span>`:'';
   let body;
   if(m.error){
@@ -849,9 +1327,104 @@ function cardHTML(m,{root,last,inCmp}){
   }
   return `<div class="ai-card" style="--c:${p.color}"><div class="ai-head">${medal}<b>${esc(p.name)}</b><span class="model">${esc(m.model||'')}</span>${ms}</div>${body}${actions}</div>`;
 }
+function stepsHTML(m){
+  return `<div class="steps">${m.steps.map(s=>{
+    const who=s.pid?` <em>${esc(P(s.pid)?.name||'')}</em>`:'';
+    const extra=s.status==='run'&&s.chars?` <em>${fmtK(s.chars)} krk</em>`:s.status==='ok'&&s.ms?` <em>${fmtMs(s.ms)}</em>`:s.info?` <em>${esc(s.info)}</em>`:'';
+    return `<span class="step ${s.status}"><i></i>${esc(s.label)}${who}${extra}</span>`;
+  }).join('')}</div>`;
+}
+function runFoot(m,last,extra=[]){
+  if(m.pending) return '';
+  const txt=answerOf(m);
+  const a=[];
+  if(txt){ a.push(actBtn('copy','Kopyala',m.id,'copy')); a.push(actBtn('speak','Dinle',m.id,'volume')); if(navigator.share) a.push(actBtn('share','Paylaş',m.id,'share')); }
+  a.push(...extra);
+  if(last&&!busy) a.push(actBtn(m.error?'retry':'regen',m.error?'Tekrar dene':'Yeniden',m.id,'refresh'));
+  return a.length?`<div class="ai-actions">${a.join('')}</div>`:'';
+}
+function runStatus(m){
+  if(m.error) return `<div class="err-text">${esc(m.error)}</div>`;
+  if(m.stopped) return '<div class="stopped">Durduruldu</div>';
+  return '';
+}
+function tline(m,e){ const to=e.to>=0?m.roster[e.to]?.ad:'herkes'; const col=TYPE_COL[e.type]; return `<div class="tline"><span class="tt" style="color:${col}">${e.type}</span><b>${esc(m.roster[e.i]?.ad||'?')}</b> → ${esc(to||'?')}: ${esc(e.text)}</div>`; }
+function companyHTML(m,last){
+  const teamNames=(m.teams||[]).map(pid=>P(pid)?.name).filter(Boolean);
+  let h=`<div class="run"><div class="run-head">${ic('users')}<b>Mikro-ajan şirketi</b><span class="run-meta">${m.roster.length||m.n} ajan · ${teamNames.length||'—'} model · ${m.reqs} istek</span>${!m.pending&&m.ms?`<span class="ms">${fmtMs(m.ms)}</span>`:''}</div>`;
+  h+=`<div class="run-task">${esc(m.task)}</div>`+stepsHTML(m);
+  if(m.analiz) h+=`<div class="note"><b>Görev analizi:</b> ${esc(m.analiz)}</div>`;
+  if(m.roster.length){
+    const id='r-'+m.id;
+    h+=`<details class="box" id="${id}" ${isOpen(id,false)?'open':''}><summary><span class="sum-t">Kadro · ${m.roster.length} kişi</span>${m.degisiklik?`<span class="sum-x">denetlendi</span>`:''}</summary><div class="box-body">`
+      +(m.degisiklik?`<div class="note"><b>Denetim:</b> ${esc(m.degisiklik)}</div>`:'')
+      +m.roster.map(a=>`<div class="agent-row"><span class="adot" style="background:${P(a.pid)?.color||'#888'}"></span><div><b>${esc(a.ad)}</b> · ${esc(a.rol)} <small>${esc(a.neden)}${a.tutum?' · '+esc(a.tutum):''} · ${esc(P(a.pid)?.name||'')}</small></div></div>`).join('')
+      +'</div></details>';
+  }
+  if(m.pending&&m.events.length) h+=`<div class="ticker">${m.events.slice(-3).map(e=>tline(m,e)).join('')}</div>`;
+  if(m.events.length){
+    const id='t-'+m.id;
+    h+=`<details class="box" id="${id}" ${isOpen(id,false)?'open':''}><summary><span class="sum-t">Tartışma dökümü</span><span class="sum-x">${m.events.length} mesaj</span></summary><div class="box-body">`
+      +[1,2].map(r=>{ const ev=m.events.filter(e=>e.round===r); return ev.length?`<div class="round-h">${r}. tur</div>`+ev.map(e=>tline(m,e)).join(''):''; }).join('')+'</div></details>';
+  }
+  if(!m.pending&&m.events.length){
+    const cnt={}; m.events.forEach(e=>cnt[e.i]=(cnt[e.i]||0)+1);
+    const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([i,c])=>`${esc(m.roster[i].ad)} (${c})`).join(', ');
+    const tc={}; m.events.forEach(e=>e.tags.forEach(t=>tc[t]=(tc[t]||0)+1));
+    const tags=Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([t])=>esc(t));
+    const crit=Math.round(m.events.filter(e=>e.type==='eleştiri').length/m.events.length*100);
+    h+=`<div class="chips"><span class="kchip">En aktif: <b>${top}</b></span><span class="kchip">Eleştiri oranı: <b>%${crit}</b></span>${tags.length?`<span class="kchip">Öne çıkan: <b>${tags.join(' · ')}</b></span>`:''}</div>`;
+  }
+  if(m.report) h+=`<div class="report" style="--c:${P(m.reportPid||'gemini')?.color}"><div class="report-title">${ic('check')} Konsensüs raporu</div><div class="md">${md(m.report)}${m.pending?'<span class="caret"></span>':''}</div></div>`;
+  h+=runStatus(m);
+  const extra=m.events.length&&!m.pending?[actBtn('replay','Tekrar oynat',m.id,'play'),actBtn('map','Zihin haritası',m.id,'map')]:[];
+  h+=runFoot(m,last,extra)+'</div>';
+  return h;
+}
+function debateHTML(m,last){
+  const jn=P(m.judge)?.name||'';
+  let h=`<div class="run"><div class="run-head">${ic('scale')}<b>Münazara</b><span class="run-meta">${m.items.length} model · hakem ${esc(jn)} · ${m.reqs} istek</span>${!m.pending&&m.ms?`<span class="ms">${fmtMs(m.ms)}</span>`:''}</div>`;
+  h+=`<div class="run-task">${esc(m.q)}</div>`+stepsHTML(m);
+  m.items.forEach(it=>{
+    const p=P(it.pid), id='a-'+it.id, sc=m.scores?.[it.letter];
+    const status=it.pending?(it.text?'yazıyor…':'bağlanıyor…'):it.error?'hata':sc?`${sc.t}/10`:fmtMs(it.ms);
+    h+=`<details class="box" id="${id}" style="--c:${p.color}" ${isOpen(id,m.phase==='cevap')?'open':''}><summary>${it.medal!=null?`<span class="medal">${['🥇','🥈','🥉'][it.medal]}</span>`:''}<span class="adot" style="background:${p.color};margin:0"></span><span class="sum-t">${esc(p.name)} · Cevap ${it.letter}</span><span class="sum-x ${m.winner===it.letter?'win':''}">${m.winner===it.letter?'🏆 ':''}${status}</span></summary><div class="box-body">`
+      +(it.error?`<div class="err-text">${esc(it.error)}</div>`:`<div class="md">${md(it.text)}${it.pending?'<span class="caret"></span>':''}</div>`)
+      +(it.critique?`<div class="crit"><b>Rakiplerine eleştirisi</b><div class="md">${md(it.critique)}</div></div>`:'')
+      +(sc&&sc.yorum?`<div class="note"><b>Hakem:</b> ${esc(sc.yorum)}</div>`:'')+'</div></details>';
+  });
+  if(m.scores){
+    const rows=Object.entries(m.scores).sort((a,b)=>b[1].t-a[1].t);
+    const bar=(v,c)=>`<div class="sbar"><i style="width:${v*10}%;background:${c}"></i></div>`;
+    h+=`<div class="report"><div class="report-title">${ic('trophy')} Hakem puanları</div><table class="scores"><tr><th>Model</th><th>Doğruluk</th><th>Eksiksizlik</th><th>Netlik</th><th style="text-align:right">Ort.</th></tr>`
+      +rows.map(([L,s])=>{ const it=m.items.find(x=>x.letter===L); const c=P(it?.pid)?.color||'#888'; return `<tr><td class="${m.winner===L?'win':''}">${m.winner===L?'🏆 ':''}${esc(P(it?.pid)?.name||L)} <span class="muted">(${L})</span></td><td>${bar(s.d,c)}</td><td>${bar(s.e,c)}</td><td>${bar(s.n,c)}</td><td class="tot">${s.t}</td></tr>`; }).join('')
+      +`</table>${m.reason?`<div class="note"><b>Gerekçe:</b> ${esc(m.reason)}</div>`:''}</div>`;
+  }
+  if(m.final) h+=`<div class="report"><div class="report-title">${ic('check')} Nihai cevap</div>${m.finalNote?`<div class="note">${esc(m.finalNote)}</div>`:''}<div class="md">${md(m.final)}${m.pending?'<span class="caret"></span>':''}</div></div>`;
+  h+=runStatus(m)+runFoot(m,last)+'</div>';
+  return h;
+}
+function pipelineHTML(m,last){
+  let h=`<div class="run"><div class="run-head">${ic('factory')}<b>Üretim bandı</b><span class="run-meta">${m.stations.length||'—'} istasyon · ${m.reqs} istek</span>${!m.pending&&m.ms?`<span class="ms">${fmtMs(m.ms)}</span>`:''}</div>`;
+  h+=`<div class="run-task">${esc(m.task)}</div>`+stepsHTML(m);
+  m.stations.forEach((s,i)=>{
+    const p=P(s.pid), id='s-'+s.id, isLastSt=i===m.stations.length-1;
+    const st=s.status==='run'?(s.text?`${fmtK(s.text.length)} krk`:'başlıyor…'):s.status==='ok'?`✓ ${fmtMs(s.ms)}`:s.status==='err'?'hata':s.status==='stop'?'durdu':'bekliyor';
+    h+=`<details class="box" id="${id}" ${isOpen(id,s.status==='run'&&!isLastSt)?'open':''}><summary><span class="idx">${i+1}</span><span class="sum-t">${esc(s.ad)}</span><span class="sum-x">${esc(p?.name||'')} · ${st}${s.retried?' · yeniden denendi':''}</span></summary><div class="box-body"><div class="gorev">${esc(s.gorev)}</div>`
+      +(s.error?`<div class="err-text">${esc(s.error)}</div>`:'')+(s.text&&!(isLastSt&&s.status==='ok')?`<div class="md">${md(s.text)}${s.status==='run'?'<span class="caret"></span>':''}</div>`:isLastSt&&s.status==='ok'?'<div class="note">Çıktı aşağıda “Sonuç” bölümünde.</div>':'')+'</div></details>';
+  });
+  const lastSt=m.stations[m.stations.length-1];
+  const fin=m.final||(lastSt&&lastSt.status==='run'?lastSt.text:'');
+  if(fin) h+=`<div class="report"><div class="report-title">${ic('check')} Sonuç</div><div class="md">${md(fin)}${m.pending?'<span class="caret"></span>':''}</div></div>`;
+  h+=runStatus(m)+runFoot(m,last,!m.pending&&m.stations.length?[actBtn('band','Bandı göster',m.id,'factory')]:[])+'</div>';
+  return h;
+}
 function findMsg(id){
   const c=currentConv(); if(!c) return null;
-  for(const m of c.msgs){ if(m.id===id) return {msg:m,root:m}; if(m.items){ const it=m.items.find(i=>i.id===id); if(it) return {msg:it,root:m}; } }
+  for(const m of c.msgs){
+    if(m.id===id) return {msg:m,root:m};
+    for(const arr of [m.items,m.stations]){ if(arr){ const it=arr.find(i=>i.id===id); if(it) return {msg:it,root:m}; } }
+  }
   return null;
 }
 const nearBottom=()=>chat.scrollHeight-chat.scrollTop-chat.clientHeight<140;
@@ -889,18 +1462,25 @@ function speak(text){
   speechSynthesis.speak(u);
 }
 function shareText(text){ navigator.share?.({text}).catch(()=>{}); }
+const msgText=m=>m.role?answerOf(m):m.text;
 
 chat.addEventListener('click',e=>{
+  const sum=e.target.closest('summary');
+  if(sum&&sum.parentElement.id){ const d=sum.parentElement; setTimeout(()=>{ if(d.open){ openSet.add(d.id); closedSet.delete(d.id); } else { closedSet.add(d.id); openSet.delete(d.id); } }); }
   const b=e.target.closest('[data-act]'); if(!b) return;
   const act=b.dataset.act;
   if(act==='settings'){ openSheet(); return; }
-  if(act==='quick'){ const q=QUICK[+b.dataset.i]; state.settings.task=q.task; renderTools(); const t=$('#input'); t.value=q.text; live.typed=t.value.length; autoGrow(); setSendUI(); t.focus(); t.setSelectionRange(t.value.length,t.value.length); save(); return; }
+  if(act==='quick'){ const q=(MODE_INFO[state.settings.mode]||MODE_INFO.sohbet).quick[+b.dataset.i]; if(q.task) state.settings.task=q.task; renderTools(); input.value=q.text; live.typed=input.value.length; autoGrow(); setSendUI(); input.focus(); input.setSelectionRange(input.value.length,input.value.length); save(); return; }
   if(act==='copy-code'){ copyText(b.closest('.code')?.querySelector('code')?.textContent||'',b); return; }
   if(act==='regen'||act==='retry'){ regenerate(); return; }
+  if(act==='orig'){ regenerate(true); return; }
   const f=findMsg(b.dataset.id); if(!f) return;
-  if(act==='copy') copyText(f.msg.text,b);
-  else if(act==='speak') speak(f.msg.text);
-  else if(act==='share') shareText(f.msg.text);
+  if(act==='copy') copyText(msgText(f.msg),b);
+  else if(act==='speak') speak(msgText(f.msg));
+  else if(act==='share') shareText(msgText(f.msg));
+  else if(act==='replay'){ setView('company'); setMax(true); coReplay(f.msg); }
+  else if(act==='map'){ live.co=coBuild(f.msg); f.msg.events.forEach(ev=>coEvent(ev,false)); setView('company'); setMax(true); }
+  else if(act==='band'){ live.pl=f.msg; live.plMove=null; setView('pipeline'); if(state.settings.stageCollapsed){ state.settings.stageCollapsed=false; applyStage(); } $('#stage').scrollIntoView?.({block:'nearest'}); }
 });
 
 /* =====================================================================
@@ -914,22 +1494,33 @@ function setSendUI(){
   else{ b.className='send'; b.innerHTML=ic('send'); b.disabled=!input.value.trim()&&!pendingImage; b.setAttribute('aria-label','Gönder'); }
 }
 function renderTools(){
-  const s=state.settings;
-  const fill=(sel,opts,val,label)=>{ sel.innerHTML=opts.map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join(''); sel.value=val; if(sel.value!==val){ sel.value=opts[0][0]; } $(label).textContent=opts.find(o=>o[0]===sel.value)[1].replace(' (anahtar yok)',''); };
-  fill($('#targetSel'),TARGETS(),s.target,'#targetVal');
-  fill($('#taskSel'),Object.entries(TASKS).map(([k,v])=>[k,v.label]),s.task,'#taskVal');
-  fill($('#lenSel'),Object.entries(LENGTHS).map(([k,v])=>[k,v.label]),s.len,'#lenVal');
+  const s=state.settings, mode=s.mode;
+  const fill=(sel,opts,val,label)=>{ const el=$(sel); el.innerHTML=opts.map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join(''); el.value=String(val); if(el.value!==String(val)) el.value=opts[0][0]; $(label).textContent=opts.find(o=>o[0]===el.value)[1].replace(' (anahtar yok)',''); };
+  fill('#modeSel',Object.entries(MODES).map(([k,v])=>[k,v.label]),mode,'#modeVal');
+  fill('#targetSel',[['auto','Otomatik'],['all','Hepsi · yarıştır'],...PROVIDERS.map(p=>[p.id,p.name+(state.keys[p.id]?'':' (anahtar yok)')])],s.target,'#targetVal');
+  fill('#taskSel',Object.entries(TASKS).map(([k,v])=>[k,v.label]),s.task,'#taskVal');
+  fill('#agentsSel',[8,12,16,20].map(n=>[String(n),n+' ajan']),s.agents,'#agentsVal');
+  fill('#judgeSel',[['auto','Hakem: otomatik'],...PROVIDERS.map(p=>[p.id,'Hakem: '+p.name])],s.judge,'#judgeVal');
+  fill('#lenSel',Object.entries(LENGTHS).map(([k,v])=>[k,v.label]),s.len,'#lenVal');
+  $('#pTarget').hidden=mode!=='sohbet'; $('#pTask').hidden=mode!=='sohbet';
+  $('#pAgents').hidden=mode!=='sirket'; $('#pJudge').hidden=mode!=='munazara';
+  $('#healBtn').classList.toggle('on',!!s.heal);
+  $('#attachBtn').hidden=mode!=='sohbet';
+  input.placeholder=MODES[mode].ph;
 }
-[['#targetSel','target'],['#taskSel','task'],['#lenSel','len']].forEach(([sel,key])=>{
-  $(sel).addEventListener('change',e=>{ state.settings[key]=e.target.value; save(); renderTools(); });
+[['#modeSel','mode'],['#targetSel','target'],['#taskSel','task'],['#agentsSel','agents'],['#judgeSel','judge'],['#lenSel','len']].forEach(([sel,key])=>{
+  $(sel).addEventListener('change',e=>{
+    state.settings[key]=key==='agents'?+e.target.value:e.target.value; save(); renderTools();
+    if(key==='mode'){ renderHeader(); const c=currentConv(); if(!c||!c.msgs.length) renderChat(); if(e.target.value!=='sohbet') clearAttach(); }
+  });
 });
+$('#healBtn').addEventListener('click',()=>{ state.settings.heal=!state.settings.heal; save(); renderTools(); toast(state.settings.heal?'İstem iyileştirme açık: sorular göndermeden önce netleştirilecek (+1 istek)':'İstem iyileştirme kapalı'); });
 input.addEventListener('input',()=>{ live.typingAt=Date.now(); live.typed=input.value.length; autoGrow(); setSendUI(); });
 input.addEventListener('focus',()=>{ live.focus=true; });
 input.addEventListener('blur',()=>{ live.focus=false; });
 input.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey&&!coarse&&!e.isComposing){ e.preventDefault(); send(); } });
 $('#sendBtn').addEventListener('click',()=>{ busy?stopAll():send(); });
 
-/* görsel ekleme */
 function loadImg(file){ return new Promise((res,rej)=>{ const u=URL.createObjectURL(file); const im=new Image(); im.onload=()=>{ URL.revokeObjectURL(u); res(im); }; im.onerror=rej; im.src=u; }); }
 function scaled(im,max,q){ const r=Math.min(1,max/Math.max(im.width,im.height)); const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(im.width*r)); c.height=Math.max(1,Math.round(im.height*r)); c.getContext('2d').drawImage(im,0,0,c.width,c.height); return c.toDataURL('image/jpeg',q); }
 $('#attachBtn').addEventListener('click',()=>{ if(!state.keys.gemini){ toast('Görsel sormak için Gemini anahtarı gerekli'); return; } $('#fileInput').click(); });
@@ -940,8 +1531,6 @@ $('#fileInput').addEventListener('change',async e=>{
 });
 function clearAttach(){ pendingImage=null; $('#attach').hidden=true; setSendUI(); }
 $('#attachX').addEventListener('click',clearAttach);
-
-/* sesle yazma */
 (function(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition, btn=$('#micBtn');
   if(!SR){ btn.style.display='none'; return; }
@@ -954,7 +1543,7 @@ $('#attachX').addEventListener('click',clearAttach);
 })();
 
 /* =====================================================================
-   SOHBET LİSTESİ
+   SOHBET LİSTESİ, ÇEKMECE, AYARLAR
    ===================================================================== */
 function newConv(focus=true){
   const cur=currentConv();
@@ -967,9 +1556,11 @@ function newConv(focus=true){
 }
 function renderDrawer(){
   const q=($('#convSearch').value||'').toLowerCase().trim();
-  const list=state.convs.filter(c=>c.msgs.length&&(!q||c.title.toLowerCase().includes(q)||c.msgs.some(m=>(m.text||'').toLowerCase().includes(q))));
+  const hay=c=>c.title+' '+c.msgs.map(m=>(m.text||'')+(m.task||'')+(m.q||'')+(m.report||'')+(m.final||'')).join(' ');
+  const list=state.convs.filter(c=>c.msgs.length&&(!q||hay(c).toLowerCase().includes(q)));
+  const modeIcon=c=>{ const u=c.msgs.find(m=>m.role==='user'); return u&&u.mode&&u.mode!=='sohbet'?MODES[u.mode].label+' · ':''; };
   $('#convList').innerHTML=list.length?list.map(c=>`<div class="conv ${c.id===state.currentId?'on':''}" data-act="open" data-id="${c.id}">
-      <div class="conv-main"><div class="conv-title">${esc(c.title)}</div><div class="conv-meta">${c.msgs.filter(m=>m.role==='user').length} soru · ${ago(c.updated)}</div></div>
+      <div class="conv-main"><div class="conv-title">${esc(c.title)}</div><div class="conv-meta">${modeIcon(c)}${c.msgs.filter(m=>m.role==='user').length} görev · ${ago(c.updated)}</div></div>
       <button class="icon-btn sm del" data-act="del" data-id="${c.id}" aria-label="Sohbeti sil">${ic('trash')}</button></div>`).join('')
     :`<div class="conv-empty">${q?'Sonuç bulunamadı':'Henüz kayıtlı sohbet yok'}</div>`;
   $('#drawerStats').innerHTML=`Toplam <b>${fmtNum(state.stats.req)}</b> istek · <b>${fmtNum(state.stats.tok)}</b> token · <b>${fmtNum(state.stats.err)}</b> hata<br>Bugün <b>${todayTotal()}</b> istek`;
@@ -989,18 +1580,15 @@ $('#convList').addEventListener('click',e=>{
 });
 $('#convSearch').addEventListener('input',renderDrawer);
 
-/* =====================================================================
-   ÇEKMECE, AYARLAR, BİLDİRİM
-   ===================================================================== */
 const scrim=$('#scrim');
 function openDrawer(){ renderDrawer(); $('#drawer').classList.add('show'); scrim.classList.add('show'); }
 function closeDrawer(){ $('#drawer').classList.remove('show'); if(!$('#sheet').classList.contains('show')) scrim.classList.remove('show'); }
 function openSheet(){ renderSheet(); $('#sheet').classList.add('show'); scrim.classList.add('show'); }
-function closeSheet(){ $('#sheet').classList.remove('show'); if(!$('#drawer').classList.contains('show')) scrim.classList.remove('show'); renderTools(); renderHeader(); }
+function closeSheet(){ $('#sheet').classList.remove('show'); if(!$('#drawer').classList.contains('show')) scrim.classList.remove('show'); renderTools(); renderHeader(); const c=currentConv(); if(!c||!c.msgs.length) renderChat(); }
 scrim.addEventListener('click',()=>{ closeDrawer(); closeSheet(); });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeDrawer(); closeSheet(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeDrawer(); closeSheet(); if($('#app').classList.contains('stage-max')) setMax(false); } });
 let toastT=0;
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2800); }
 
 function provStatus(p){
   const st=provState(p);
@@ -1042,7 +1630,8 @@ function renderSheet(){
       <div class="hint">Anahtarlar yalnızca bu cihazda saklanır; sadece ilgili sağlayıcıya gönderilir.</div></div>
     <div class="sec"><h4>Cevap tercihleri</h4>
       <label class="field"><span>Kişisel talimat</span><textarea class="inp" id="persona" rows="3" placeholder="Örn: Bana 'kanka' diye hitap et, örneklerle anlat.">${esc(s.persona)}</textarea>
-      <div class="hint">Her soruda yapay zekâya iletilir.</div></label>
+      <div class="hint">Her soruda ve her modda yapay zekâya iletilir.</div></label>
+      <label class="switch"><span>İstemi otomatik iyileştir (+1 istek)</span><input type="checkbox" id="healSw" ${s.heal?'checked':''}></label>
       <label class="switch"><span>Cevapları otomatik sesli oku</span><input type="checkbox" id="autoSpeak" ${s.autoSpeak?'checked':''}></label>
     </div>
     <div class="sec"><h4>Veri</h4>
@@ -1062,6 +1651,7 @@ sheetBody.addEventListener('change',e=>{
   if(t.dataset.key){ save(); const p=P(t.dataset.key); if(state.keys[p.id]&&!state.modelFetchedAt[p.id]) refreshModels(p,{silent:true}); refreshStatusPill(p.id); }
   else if(t.dataset.model){ state.models[t.dataset.model]=t.value; save(); }
   else if(t.id==='autoSpeak'){ state.settings.autoSpeak=t.checked; save(); }
+  else if(t.id==='healSw'){ state.settings.heal=t.checked; save(); renderTools(); }
 });
 function refreshStatusPill(pid){ const el=$('#prov-'+pid+' .spill'); if(!el) return; const [txt,cls]=provStatus(P(pid)); el.textContent=txt; el.className='spill '+cls; }
 sheetBody.addEventListener('click',async e=>{
@@ -1084,22 +1674,25 @@ async function testProvider(p){
   testing=true; out.innerHTML='<span class="muted">Test ediliyor…</span>';
   const prev=live.controller; live.controller=new AbortController();
   const m={id:uid(),pid:p.id,text:'',pending:true};
-  const r=await streamInto(m,p,[{role:'user',content:'Sadece "OK" yaz.'}],null);
+  const r=await streamInto(m,p,[{role:'user',content:'Sadece "OK" yaz.'}],null,{timeout:30000});
   live.controller=prev; testing=false;
-  out.innerHTML=r.ok?`<span class="good">✓ Çalışıyor · ${fmtMs(m.ms)} · ${esc(m.model)}</span>`:`<span class="bad">${esc(m.error||'Başarısız')}</span>`;
-  const keep=out.innerHTML; refreshProvCard(p.id); const o2=$('#test-'+p.id); if(o2) o2.innerHTML=keep;
+  const html=r.ok?`<span class="good">✓ Çalışıyor · ${fmtMs(m.ms)} · ${esc(m.model)}</span>`:`<span class="bad">${esc(m.error||'Başarısız')}</span>`;
+  refreshProvCard(p.id); const o2=$('#test-'+p.id); if(o2) o2.innerHTML=html;
 }
 function exportConv(){
   const c=currentConv();
   if(!c||!c.msgs.length){ toast('İndirilecek sohbet yok'); return; }
-  const lines=[`# ${c.title}`,`${new Date(c.created).toLocaleString('tr-TR')}`,''];
+  const L=[`# ${c.title}`,new Date(c.created).toLocaleString('tr-TR'),''];
   c.msgs.forEach(m=>{
-    if(m.role==='user') lines.push('## Sen',m.text||'(görsel)','');
-    else if(m.role==='assistant') lines.push(`## ${P(m.pid)?.name||'Asistan'} (${m.model||''})`,m.error||m.text,'');
-    else m.items.forEach(it=>lines.push(`## ${P(it.pid)?.name} (${it.model})${it.medal!=null?' '+['🥇','🥈','🥉'][it.medal]:''}`,it.error||it.text,''));
+    if(m.role==='user'){ L.push('## Sen'+(m.mode&&m.mode!=='sohbet'?` (${MODES[m.mode].label})`:''),m.text||'(görsel)'); if(m.healed) L.push('','> İyileştirilmiş istem: '+m.healed); L.push(''); }
+    else if(m.role==='assistant') L.push(`## ${P(m.pid)?.name||'Asistan'} (${m.model||''})`,m.error||m.text,'');
+    else if(m.role==='compare') m.items.forEach(it=>L.push(`## ${P(it.pid)?.name} (${it.model})${it.medal!=null?' '+['🥇','🥈','🥉'][it.medal]:''}`,it.error||it.text,''));
+    else if(m.role==='company'){ L.push('## Mikro-ajan şirketi',`Kadro: ${m.roster.map(a=>a.ad+' ('+a.rol+')').join(', ')}`,'','### Tartışma'); m.events.forEach(e=>L.push(`- ${m.roster[e.i]?.ad} → ${e.to>=0?m.roster[e.to]?.ad:'herkes'} [${e.type}]: ${e.text}`)); L.push('','### Konsensüs raporu',m.report||m.error||'',''); }
+    else if(m.role==='debate'){ L.push('## Münazara'); m.items.forEach(it=>L.push(`### ${P(it.pid)?.name} · Cevap ${it.letter}${m.scores?.[it.letter]?` · ${m.scores[it.letter].t}/10`:''}`,it.text||it.error||'')); L.push('','### Nihai cevap',m.final||m.error||'',''); }
+    else if(m.role==='pipeline'){ L.push('## Üretim bandı'); m.stations.forEach((s,i)=>L.push(`### ${i+1}. ${s.ad} (${P(s.pid)?.name})`,s.text||s.error||'')); L.push('','### Sonuç',m.final||m.error||'',''); }
   });
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/markdown;charset=utf-8'}));
+  a.href=URL.createObjectURL(new Blob([L.join('\n')],{type:'text/markdown;charset=utf-8'}));
   a.download=(c.title.replace(/[^\wçğıöşüÇĞİÖŞÜ -]/g,'').trim().slice(0,40)||'sohbet')+'.md';
   document.body.appendChild(a); a.click(); a.remove();
 }
@@ -1107,55 +1700,69 @@ function exportConv(){
 /* =====================================================================
    CANLI EKRAN — her hareket gerçek bir veriye bağlıdır
    ===================================================================== */
-const LW=240,LH=120,HORIZON=54,DX=[40,120,200],DY=72,HUBP={x:118,y:46};
-const deskP=i=>({x:DX[i]-11,y:DY-1});
-const off=document.createElement('canvas'); off.width=LW; off.height=LH;
-const o=off.getContext('2d');
 const cv=$('#scene'), ctx=cv.getContext('2d');
-let W=0,H=0,DPR=1,sc=1,ox=0,oy=0,lastDraw=0,lastHud=0;
+let W=0,H=0,DPR=1,lastDraw=0,lastHud=0;
+function rr(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x,y,w,h,r); else ctx.rect(x,y,w,h); }
+function wrapText(text,maxW,maxLines){
+  const words=String(text).split(/\s+/), lines=[]; let cur='', i=0;
+  for(;i<words.length;i++){ const t=cur?cur+' '+words[i]:words[i]; if(ctx.measureText(t).width<=maxW){ cur=t; continue; } if(cur) lines.push(cur); cur=words[i]; if(lines.length===maxLines) break; }
+  if(lines.length<maxLines&&cur){ lines.push(cur); i=words.length; }
+  if(i<words.length||lines.some(l=>ctx.measureText(l).width>maxW)){ let l=lines[lines.length-1]||''; while(l.length>1&&ctx.measureText(l+'…').width>maxW) l=l.slice(0,-1); lines[lines.length-1]=l+'…'; }
+  return lines;
+}
+function centerMsg(a,b){
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font='600 14px Inter, system-ui, sans-serif'; ctx.fillStyle='rgba(238,234,255,.85)'; ctx.fillText(a,W/2,H/2-10);
+  if(b){ ctx.font='500 12px Inter, system-ui, sans-serif'; ctx.fillStyle='rgba(154,148,191,.85)'; ctx.fillText(b,W/2,H/2+12); }
+}
+
+/* ---------- görünüm 1: piksel ofis ---------- */
+const LW=216,HORIZON=54,DX=[36,108,180],HUBP={x:108,y:46};
+let LHd=120,DY=72,sc=1,ox=0,oy=0;
+const deskP=i=>({x:DX[i]-11,y:DY-1});
+const off=document.createElement('canvas'); off.width=LW; off.height=LHd;
+const o=off.getContext('2d');
 function R(x,y,w,h,c){ o.fillStyle=c; o.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
 const sx=x=>ox+x*sc, sy=y=>oy+y*sc;
-const STARS=[[3,3],[9,7],[15,2],[21,9],[27,4],[33,8],[39,3],[6,12],[30,13],[18,13],[41,10],[12,5]];
-const BUILD=[[0,18,6],[6,14,5],[11,20,7],[18,12,6],[24,17,5],[29,10,7],[36,15,8]];
+const STARS=[[3,3],[9,7],[15,2],[21,9],[27,4],[33,8],[37,3],[6,12],[30,13],[18,13],[36,10],[12,5]];
+const BUILD=[[0,18,6],[6,14,5],[11,20,7],[18,12,6],[24,17,5],[29,10,7],[36,15,4]];
 function skyFor(h){ if(h>=6&&h<8) return['#6d28d9','#f59e0b',false]; if(h>=8&&h<17) return['#2563eb','#7dd3fc',false]; if(h>=17&&h<19.5) return['#7c3aed','#fb7185',false]; return['#050822','#16195a',true]; }
-
 function drawRoom(d,now){
-  R(0,0,LW,LH,'#0b0819'); R(0,0,LW,HORIZON,'#110c22');
+  R(0,0,LW,LHd,'#0b0819'); R(0,0,LW,HORIZON,'#110c22');
   for(let x=4;x<LW;x+=12) R(x,0,1,HORIZON-2,'#150f2b');
   R(0,HORIZON-2,LW,2,'#2b1f52');
-  for(let x=0;x<LW;x+=16) R(x,HORIZON,1,LH-HORIZON,'#120d26');
-  for(let y=HORIZON+8;y<LH;y+=10) R(0,y,LW,1,'#120d26');
+  for(let x=0;x<LW;x+=16) R(x,HORIZON,1,LHd-HORIZON,'#120d26');
+  for(let y=HORIZON+8;y<LHd;y+=10) R(0,y,LW,1,'#120d26');
+  if(DY-HORIZON>44){ const ry=Math.round((HORIZON+DY)/2)+2; R(54,ry-6,108,13,'#191235'); R(54,ry-6,108,1,'#2e2160'); R(54,ry+6,108,1,'#2e2160'); for(let x=58;x<160;x+=6) R(x,ry,2,1,'#2a1f52'); }
   // pencere: gökyüzü gerçek saate göre
   const h=d.getHours()+d.getMinutes()/60, [top,bot,night]=skyFor(h);
-  const wx=8,wy=8,ww=44,wh=28;
+  const wx=6,wy=8,ww=40,wh=28;
   R(wx-2,wy-2,ww+4,wh+4,'#2b1f52');
   for(let i=0;i<wh;i++) R(wx,wy+i,ww,1,mix(top,bot,i/(wh-1)));
   if(night){ STARS.forEach(([a,b])=>R(wx+a,wy+b,1,1,'#e8e6ff')); const f=((h+24-19.5)%24)/10.5; R(wx+2+f*(ww-8),wy+3+Math.abs(f-.5)*8,4,4,'#f5f3c8'); }
-  else { const f=Math.min(1,Math.max(0,(h-6)/13.5)); R(wx+2+f*(ww-9),wy+3+Math.abs(f-.5)*10,5,5,'#fde047'); }
+  else { const f=clamp((h-6)/13.5,0,1); R(wx+2+f*(ww-9),wy+3+Math.abs(f-.5)*10,5,5,'#fde047'); }
   BUILD.forEach(([bx,by,bw],k)=>{ R(wx+bx,wy+by,bw,wh-by,night?'#0b0920':'#1e1b4b'); if(night) for(let yy=by+2;yy<wh-1;yy+=3) for(let xx=1;xx<bw-1;xx+=2) if((xx*7+yy*3+k*5)%5===0) R(wx+bx+xx,wy+yy,1,1,'#fcd34d'); });
   R(wx+ww/2,wy,1,wh,'#2b1f52'); R(wx,wy+wh/2,ww,1,'#2b1f52'); R(wx-3,wy+wh+2,ww+6,2,'#3a2a6a');
-  // duvar saati kutusu
-  R(60,10,40,15,'#1b1338'); R(61,11,38,13,'#05030c');
+  // duvar saati
+  R(52,10,36,15,'#1b1338'); R(53,11,34,13,'#05030c');
   // duvar ekranı: son isteklerin gerçek token sayıları
-  R(146,4,64,36,'#1b1338'); R(148,6,60,31,'#04060f');
+  R(140,4,50,34,'#1b1338'); R(142,6,46,29,'#04060f');
   const bars=state.recent.filter(r=>r.ok===true&&r.tok>0).map(r=>({v:r.tok,c:P(r.pid)?.color||'#888'}));
   PROVIDERS.forEach(p=>{ const lp=live.prov[p.id]; if(lp.phase==='stream') bars.push({v:Math.ceil(lp.chars/4),c:mix(p.color,'#ffffff',.55)}); });
-  const show=bars.slice(-11);
-  if(show.length){ const max=Math.max(...show.map(b=>b.v),1); show.forEach((b,k)=>{ const hh=Math.max(1,Math.round(b.v/max*26)); R(150+k*5,36-hh,4,hh,b.c); }); }
+  const show=bars.slice(-9);
+  if(show.length){ const max=Math.max(...show.map(b=>b.v),1); show.forEach((b,k)=>{ const hh=Math.max(1,Math.round(b.v/max*25)); R(144+k*5,34-hh,4,hh,b.c); }); }
   // sunucu rafı: son 8 isteğin sonucu, sağlayıcısı ve süresi
-  R(214,6,22,HORIZON-8,'#0c0a1c'); R(214,6,22,1,'#2b1f52');
+  R(194,6,18,HORIZON-8,'#0c0a1c'); R(194,6,18,1,'#2b1f52');
   const recs=state.recent.slice(-8);
   for(let k=0;k<8;k++){
-    const y=9+k*5, r=recs[recs.length-1-k]; R(216,y,18,3,'#15102b');
-    if(!r){ R(217,y+1,2,1,'#241c3f'); continue; }
+    const y=9+k*5, r=recs[recs.length-1-k]; R(196,y,14,3,'#15102b');
+    if(!r){ R(197,y+1,2,1,'#241c3f'); continue; }
     const c=r.ok===true?'#34d399':r.ok===false?'#fb7185':r.ok==='stop'?'#8e89b3':(Math.floor(now/180)%2?'#fbbf24':'#5a4310');
-    R(217,y+1,2,1,c); R(220,y+1,3,1,P(r.pid)?.color||'#666');
-    if(r.ms) R(224,y+1,Math.min(9,Math.max(1,Math.round(r.ms/500))),1,'#4c3f86');
+    R(197,y+1,2,1,c); R(200,y+1,3,1,P(r.pid)?.color||'#666');
+    if(r.ms) R(204,y+1,Math.min(6,Math.max(1,Math.round(r.ms/600))),1,'#4c3f86');
   }
-  // bitkiler (sabit dekor)
-  [[3,98],[229,98]].forEach(([x,y])=>{ R(x,y+6,6,5,'#7a3b1c'); R(x-1,y+1,8,5,'#1f9d62'); R(x+1,y-1,4,2,'#34d399'); });
+  [[2,LHd-22],[207,LHd-22]].forEach(([x,y])=>{ R(x,y+6,6,5,'#7a3b1c'); R(x-1,y+1,8,5,'#1f9d62'); R(x+1,y-1,4,2,'#34d399'); });
 }
-
 function drawLinks(now){
   PROVIDERS.forEach((p,i)=>{
     if(!state.keys[p.id]) return;
@@ -1167,7 +1774,6 @@ function drawLinks(now){
     for(let k=0;k<=n;k++){ const kk=dir===-1?n-k:k; if(((kk-ph)%gap+gap)%gap!==0) continue; R(a.x+dx*k/n,a.y+dy*k/n,1,1,col); }
   });
 }
-
 function drawChar(x,y,color,st,now){
   const sleep=st==='off', skin='#f2c9a0';
   R(x+8,y+4,2,12,'#2a2150'); R(x-1,y+14,11,2,'#2a2150'); R(x+3,y+16,2,6,'#1d1838'); R(x,y+21,8,1,'#1d1838');
@@ -1188,12 +1794,10 @@ function drawChar(x,y,color,st,now){
     const n=Math.floor(now/260)%4; for(let k=0;k<Math.min(3,n);k++) R(x+11+k*3,y-6,2,1,'#3b2a5c');
   }
 }
-
 function drawMonitor(x,y,p,st,now,i){
   R(x,y,22,15,'#1c1636'); R(x,y,22,1,'#2e2558');
-  const X=x+2,Y=y+2,w=18,h=10, lp=live.prov[p.id];
-  const bg={off:'#020205',err:'#3a0b17',cool:'#2b1f05',full:'#2b1f05',done:'#05261b'}[st]||'#070b1a';
-  R(X,Y,w,h,bg);
+  const X=x+2,Y=y+2,w=18, lp=live.prov[p.id];
+  R(X,Y,w,10,{off:'#020205',err:'#3a0b17',cool:'#2b1f05',full:'#2b1f05',done:'#05261b'}[st]||'#070b1a');
   if(st==='idle'){ R(X+1,Y+1,1,1,p.color); R(X+2,Y+2,1,1,p.color); R(X+1,Y+3,1,1,p.color); if(Math.floor(now/530)%2) R(X+4,Y+3,2,1,p.color); }
   else if(st==='wait'||st==='think'){ const n=Math.floor(now/250)%4; for(let k=0;k<n;k++) R(X+5+k*3,Y+4,2,2,p.color); }
   else if(st==='stream'||st==='type'){
@@ -1208,11 +1812,10 @@ function drawMonitor(x,y,p,st,now,i){
   R(x+19,y+13,1,1,led);
   R(x+9,y+15,4,1,'#1c1636'); R(x+7,y+16,8,1,'#1c1636');
 }
-
 function drawHub(now){
-  R(94,42,56,3,'#4a1d4d'); R(94,42,56,1,'#7a2d7a'); R(96,45,3,8,'#2a1030'); R(145,45,3,8,'#2a1030');
-  R(104,22,28,17,'#2a0f2e'); R(104,22,28,1,'#4a1d4d');
-  const X=106,Y=24,w=24; R(X,Y,w,12,'#12051a');
+  R(84,42,56,3,'#4a1d4d'); R(84,42,56,1,'#7a2d7a'); R(86,45,3,8,'#2a1030'); R(135,45,3,8,'#2a1030');
+  R(94,22,28,17,'#2a0f2e'); R(94,22,28,1,'#4a1d4d');
+  const X=96,Y=24,w=24; R(X,Y,w,12,'#12051a');
   const act=PROVIDERS.map(p=>({p,lp:live.prov[p.id],st:provState(p,now)})).filter(a=>['wait','think','stream','type'].includes(a.st));
   if(act.length){
     act.slice(0,3).forEach((a,k)=>{ const yy=Y+2+k*4;
@@ -1223,10 +1826,9 @@ function drawHub(now){
     for(let r=0;r<3;r++){ const len=Math.min(22,Math.max(0,L-r*22)); if(len) R(X+1,Y+2+r*3,len,1,'#ff3d9a'); }
     if(live.focus&&Math.floor(now/530)%2){ const r=Math.min(2,Math.floor(L/22)); R(X+1+Math.min(22,L-r*22),Y+1+r*3,1,3,'#ffffff'); }
   }else{ const cx=X+12,cy=Y+6; R(cx,cy-3,1,7,'#ff3d9a'); R(cx-3,cy,7,1,'#ff3d9a'); R(cx-1,cy-1,3,3,'#ff3d9a'); }
-  R(116,39,4,2,'#2a0f2e'); R(113,41,10,1,'#2a0f2e');
-  drawChar(136,27,'#ff3d9a',Date.now()-live.typingAt<400?'type':'idle',now);
+  R(106,39,4,2,'#2a0f2e'); R(103,41,10,1,'#2a0f2e');
+  drawChar(126,27,'#ff3d9a',Date.now()-live.typingAt<400?'type':'idle',now);
 }
-
 function drawDesk(i,p,st,now){
   const c=DX[i], y=DY, dx=c-25;
   R(dx,y+17,50,3,'#3b2a5c'); R(dx,y+17,50,1,'#5b4286'); R(dx+2,y+20,3,13,'#241a3a'); R(dx+45,y+20,3,13,'#241a3a');
@@ -1235,24 +1837,21 @@ function drawDesk(i,p,st,now){
   R(c-4,y+16,9,1,'#5a4b86');
   drawChar(c+7,y+3,p.color,st,now);
 }
-
 function fpx(size){ return Math.max(8,Math.round(size*sc)); }
 function pxText(t,x,y,color,size){ ctx.font=`${fpx(size)}px "Press Start 2P", monospace`; ctx.fillStyle=color; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(t,sx(x),sy(y)); }
-function monoText(t,x,y,color){ ctx.font=`600 ${Math.max(9,Math.round(6*sc))}px "JetBrains Mono", monospace`; ctx.fillStyle=color; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(t,sx(x),sy(y)); }
-function bubble(x,y,text,kind){
+function monoText(t,x,y,color){ ctx.font=`600 ${Math.max(9,Math.round(5.4*sc))}px "JetBrains Mono", monospace`; ctx.fillStyle=color; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(t,sx(x),sy(y)); }
+function pxBubble(x,y,text,kind){
   const col=kind==='ok'?'#34d399':kind==='err'?'#fb7185':'#fbbf24';
   ctx.font=`${fpx(4)}px "Press Start 2P", monospace`;
   const tw=ctx.measureText(text).width, bw=tw+12, bh=fpx(4)+9, px=sx(x), py=sy(y);
   ctx.fillStyle='rgba(7,5,15,.92)'; ctx.strokeStyle=col; ctx.lineWidth=1;
-  ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(px-bw/2,py-bh/2,bw,bh,5); else ctx.rect(px-bw/2,py-bh/2,bw,bh); ctx.fill(); ctx.stroke();
+  rr(px-bw/2,py-bh/2,bw,bh,5); ctx.fill(); ctx.stroke();
   ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(text,px,py+1);
 }
-
-function drawScene(now){
+function drawOffice(now){
   const d=new Date(now);
   drawRoom(d,now); drawLinks(now); drawHub(now);
   PROVIDERS.forEach((p,i)=>drawDesk(i,p,provState(p,now),now));
-  ctx.setTransform(DPR,0,0,DPR,0,0);
   ctx.fillStyle='#110c22'; ctx.fillRect(0,0,W,sy(HORIZON));
   ctx.fillStyle='#0b0819'; ctx.fillRect(0,sy(HORIZON),W,H);
   const lw=Math.max(1,sc);
@@ -1261,7 +1860,7 @@ function drawScene(now){
   for(let y=HORIZON+8;sy(y)<H;y+=10) ctx.fillRect(0,sy(y),W,lw);
   ctx.fillStyle='#2b1f52'; ctx.fillRect(0,sy(HORIZON-2),W,2*sc);
   ctx.imageSmoothingEnabled=false;
-  ctx.drawImage(off,ox,oy,LW*sc,LH*sc);
+  ctx.drawImage(off,0,0,LW,LHd,ox,oy,LW*sc,LHd*sc);
   // paketler: istek (beyaz, sen → ajan) ve gelen token parçaları (renkli, ajan → sen)
   const pn=performance.now();
   live.packets=live.packets.filter(k=>{
@@ -1275,24 +1874,275 @@ function drawScene(now){
   live.rings=live.rings.filter(r=>{
     const t=(pn-r.t0)/750; if(t>=1) return false;
     ctx.globalAlpha=1-t; ctx.strokeStyle=r.color; ctx.lineWidth=Math.max(1,sc*.8);
-    ctx.beginPath(); ctx.arc(sx(118),sy(31),(5+t*20)*sc,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
+    ctx.beginPath(); ctx.arc(sx(108),sy(31),(5+t*20)*sc,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
     return true;
   });
-  // yazılar
   const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0');
-  pxText(hh+(d.getSeconds()%2?':':' ')+mm,80,17.5,'#ff3d9a',4.6);
-  if(!state.recent.some(r=>r.ok===true&&r.tok>0)&&!PROVIDERS.some(p=>live.prov[p.id].phase==='stream')) monoText('veri yok',178,21,'#4b4570');
-  monoText('token / istek',178,46,'#5d5880');
-  pxText('SEN',118,56.5,'#ff3d9a',4.2);
+  pxText(hh+(d.getSeconds()%2?':':' ')+mm,70,17.5,'#ff3d9a',4.6);
+  if(!state.recent.some(r=>r.ok===true&&r.tok>0)&&!PROVIDERS.some(p=>live.prov[p.id].phase==='stream')) monoText('veri yok',165,20,'#4b4570');
+  monoText('token / istek',165,44,'#5d5880');
+  pxText('SEN',108,56.5,'#ff3d9a',4.2);
   PROVIDERS.forEach((p,i)=>{
     const st=provState(p,now), lp=live.prov[p.id], cnt=usageCount(p.id);
-    pxText(p.short,DX[i],108,st==='off'?'#4b4570':p.color,4.2);
+    pxText(p.short,DX[i],LHd-12,st==='off'?'#4b4570':p.color,4.2);
     const use=`${cnt}${p.limit?'/'+p.limit:''}`;
-    monoText(st==='off'?'anahtar yok':lp.lastMs!=null?`${fmtMs(lp.lastMs)} · ${use}`:`${use} istek`,DX[i],115.5,'#8e89b3');
-    if(live.cooldown[p.id]>now) bubble(DX[i]+11,DY-6,'LIMIT '+Math.ceil((live.cooldown[p.id]-now)/1000)+'s','warn');
-    else if(lp.bubble&&lp.bubble.until>now) bubble(DX[i]+11,DY-6,lp.bubble.text,lp.bubble.kind);
+    monoText(st==='off'?'anahtar yok':lp.lastMs!=null?`${fmtMs(lp.lastMs)} · ${use}`:`${use} istek`,DX[i],LHd-4.5,'#8e89b3');
+    if(live.cooldown[p.id]>now) pxBubble(DX[i]+11,DY-6,'LIMIT '+Math.ceil((live.cooldown[p.id]-now)/1000)+'s','warn');
+    else if(lp.bubble&&lp.bubble.until>now) pxBubble(DX[i]+11,DY-6,lp.bubble.text,lp.bubble.kind);
   });
 }
+
+/* ---------- görünüm 2: şirket katı + canlı zihin haritası ---------- */
+let replayTok=0;
+function coBuild(m){ const co={msgId:m.id,m,agents:[],tags:new Map(),flights:[],speech:[],thoughts:[],sel:null,lastEventAt:0,energy:0,replay:false,shown:m.events.length}; coSyncRoster(co); return co; }
+function coSyncRoster(co){
+  const m=co.m, n=m.roster.length; if(!n){ co.agents=[]; return; }
+  const k=Math.max(1,(m.teams||[]).length), gap=0.9, slots=n+k*gap;
+  const order=m.roster.map((a,i)=>i).sort((x,y)=>(m.roster[x].team-m.roster[y].team)||x-y);
+  const now=performance.now(); let s=0, prev=null; const agents=new Array(n);
+  order.forEach((i,j)=>{ const a=m.roster[i]; if(prev!==null&&a.team!==prev) s+=gap; prev=a.team; const old=co.agents[i];
+    agents[i]={i,ang:-Math.PI/2+(s+0.5)/slots*Math.PI*2,count:old?.count||0,lastAt:old?.lastAt||0,lastType:old?.lastType||null,appear:old?old.appear:now+j*70}; s+=1; });
+  co.agents=agents;
+}
+function coEvent(ev,anim){
+  const co=live.co; if(!co) return;
+  const a=co.agents[ev.i]; if(!a) return;
+  const pn=performance.now();
+  a.count++; a.lastAt=pn; a.lastType=ev.type;
+  ev.tags.forEach(t=>{ let n=co.tags.get(t); if(!n){ n={name:t,count:0,x:null,y:null,vx:0,vy:0,lastAt:0,links:new Map(),src:ev.i}; co.tags.set(t,n); } n.count++; n.lastAt=pn; });
+  for(let x=0;x<ev.tags.length;x++) for(let y=x+1;y<ev.tags.length;y++){ const A=co.tags.get(ev.tags[x]),B=co.tags.get(ev.tags[y]); A.links.set(B.name,(A.links.get(B.name)||0)+1); B.links.set(A.name,(B.links.get(A.name)||0)+1); }
+  if(anim){
+    const dur=co.replay?700:950;
+    co.flights.push({from:ev.i,to:ev.to,type:ev.type,t0:pn,dur});
+    co.speech.push({i:ev.i,text:ev.text,type:ev.type,t0:pn,dur:co.replay?1900:2800}); if(co.speech.length>3) co.speech.shift();
+    if(ev.tags.length) co.thoughts.push({i:ev.i,tags:ev.tags,t0:pn});
+  }
+  co.lastEventAt=pn; lastDraw=0;
+}
+function coReplay(m){
+  const tok=++replayTok;
+  live.co=coBuild(m); live.co.replay=true;
+  const evs=m.events.slice(), total=clamp(evs.length*280,5000,12000), gap=total/Math.max(1,evs.length);
+  evs.forEach((ev,k)=>setTimeout(()=>{ if(tok!==replayTok||!live.co||live.co.msgId!==m.id) return; coEvent(ev,true); if(k===evs.length-1) live.co.replay=false; },400+k*gap));
+}
+const nodeR=n=>Math.min(18,4+Math.sqrt(n.count)*3.2);
+function coPhysics(co,cx,cy,irx,iry){
+  const ns=[...co.tags.values()]; if(!ns.length) return 0;
+  ns.forEach(n=>{ if(n.x==null){ const a=co.agents[n.src]; const ax=a&&a.x!=null?a.x:cx, ay=a&&a.y!=null?a.y:cy; n.x=cx+(ax-cx)*0.45+(Math.random()-.5)*10; n.y=cy+(ay-cy)*0.45+(Math.random()-.5)*10; } });
+  for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++){
+    const a=ns[i],b=ns[j]; let dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;
+    if(d2<1){ dx=Math.random()-.5; dy=Math.random()-.5; d2=1; }
+    const d=Math.sqrt(d2), minD=nodeR(a)+nodeR(b)+28, f=Math.min(2.2,(minD*minD)/d2*0.35), fx=dx/d*f, fy=dy/d*f;
+    a.vx-=fx; a.vy-=fy; b.vx+=fx; b.vy+=fy;
+  }
+  ns.forEach(a=>{ a.links.forEach((w,bn)=>{ const b=co.tags.get(bn); if(!b) return; const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,f=(d-70)*0.0016*Math.min(3,w); a.vx+=dx/d*f; a.vy+=dy/d*f; }); a.vx+=(cx-a.x)*0.0035; a.vy+=(cy-a.y)*0.005; });
+  let e=0;
+  ns.forEach(a=>{ a.vx*=0.84; a.vy*=0.84; a.x+=a.vx; a.y+=a.vy; const ex=(a.x-cx)/irx, ey=(a.y-cy)/iry, q=ex*ex+ey*ey; if(q>1){ const s=1/Math.sqrt(q); a.x=cx+(a.x-cx)*s; a.y=cy+(a.y-cy)*s; a.vx*=.5; a.vy*=.5; } e+=Math.abs(a.vx)+Math.abs(a.vy); });
+  return e;
+}
+const PHASE_TXT={kadro:'KADRO ARAŞTIRILIYOR',denetim:'KADRO DENETLENİYOR · TAYİN',tur1:'1. TUR · TARTIŞMA',tur2:'2. TUR · ÇAPRAZ ELEŞTİRİ',rapor:'KONSENSÜS RAPORU YAZILIYOR',done:'TAMAMLANDI',stop:'DURDURULDU',err:'HATA'};
+function gridBg(){
+  const g=ctx.createRadialGradient(W/2,H/2,10,W/2,H/2,Math.max(W,H)*0.75); g.addColorStop(0,'#181133'); g.addColorStop(1,'#07050f');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(160,140,255,.07)'; for(let x=11;x<W;x+=22) for(let y=11;y<H;y+=22) ctx.fillRect(x,y,1.5,1.5);
+}
+function drawCompany(now){
+  gridBg();
+  const co=live.co;
+  if(!co){ centerMsg('Şirket modunda bir görev ver','Göreve özel kadro burada toplanır ve tartışır'); return; }
+  const m=co.m, pn=performance.now();
+  if(co.agents.length!==m.roster.length) coSyncRoster(co);
+  const cx=W/2, cy=H/2+8, rx=Math.max(80,W/2-50), ry=Math.max(60,H/2-40);
+  ctx.strokeStyle='rgba(160,140,255,.10)'; ctx.lineWidth=1; ctx.setLineDash([3,6]); ctx.beginPath(); ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+  co.agents.forEach(a=>{ if(!a) return; a.x=cx+Math.cos(a.ang)*rx; a.y=cy+Math.sin(a.ang)*ry; });
+  // ekip etiketleri
+  (m.teams||[]).forEach((pid,t)=>{ const ag=co.agents.filter((a,i)=>a&&m.roster[i].team===t); if(!ag.length) return;
+    const mx=ag.reduce((s,a)=>s+Math.cos(a.ang),0), my=ag.reduce((s,a)=>s+Math.sin(a.ang),0), L=Math.hypot(mx,my)||1;
+    ctx.font='700 10px Inter, system-ui, sans-serif'; ctx.fillStyle=rgba(P(pid).color,.75); ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(P(pid).name.toUpperCase()+' EKİBİ',cx+mx/L*rx*0.74,cy+my/L*ry*0.74); });
+  co.energy=coPhysics(co,cx,cy,rx*0.6,ry*0.56);
+  // kavram bağlantıları
+  co.tags.forEach(a=>a.links.forEach((w,bn)=>{ const b=co.tags.get(bn); if(!b||a.name>b.name) return; ctx.strokeStyle=`rgba(167,139,250,${Math.min(.5,.12+w*.08)})`; ctx.lineWidth=Math.min(3,.8+w*.4); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }));
+  // ajan → kavram düşünce çizgileri (yeni mesajlar)
+  co.thoughts=co.thoughts.filter(t=>{ const age=pn-t.t0; if(age>2200) return false; const a=co.agents[t.i]; if(!a) return false;
+    ctx.strokeStyle=rgba(P(m.roster[t.i].pid)?.color||'#888888',.45*(1-age/2200)); ctx.lineWidth=1;
+    t.tags.forEach(tg=>{ const n=co.tags.get(tg); if(n&&n.x!=null){ ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(n.x,n.y); ctx.stroke(); } }); return true; });
+  // kavram düğümleri
+  const top=new Set([...co.tags.values()].sort((a,b)=>b.count-a.count).slice(0,14).map(n=>n.name));
+  co.tags.forEach(n=>{
+    const r=nodeR(n), hot=pn-n.lastAt<1600, sel=co.sel&&co.sel.kind==='tag'&&co.sel.name===n.name;
+    if(hot){ ctx.shadowColor='#ff3d9a'; ctx.shadowBlur=14; }
+    ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2); ctx.fillStyle=hot?'rgba(255,61,154,.38)':'rgba(139,92,246,.24)'; ctx.fill();
+    ctx.shadowBlur=0; ctx.lineWidth=sel?2:1.2; ctx.strokeStyle=sel?'#ffffff':hot?'#ff3d9a':'rgba(167,139,250,.6)'; ctx.stroke();
+    if(top.has(n.name)||hot||sel){ ctx.font=`${hot||sel?700:600} 10.5px Inter, system-ui, sans-serif`; ctx.fillStyle=hot||sel?'#ffffff':'#d6d0ff'; ctx.textAlign='center'; ctx.textBaseline='top'; ctx.fillText(trunc(n.name,20),n.x,n.y+r+3); }
+  });
+  // uçan mesajlar
+  co.flights=co.flights.filter(f=>{
+    const t=(pn-f.t0)/f.dur; if(t>=1) return false;
+    const a=co.agents[f.from]; if(!a||a.x==null) return true;
+    const b=f.to>=0&&co.agents[f.to]?co.agents[f.to]:{x:cx,y:cy};
+    const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2, mx=(a.x+b.x)/2*0.6+cx*0.4, my=(a.y+b.y)/2*0.6+cy*0.4;
+    const x=(1-e)*(1-e)*a.x+2*(1-e)*e*mx+e*e*b.x, y=(1-e)*(1-e)*a.y+2*(1-e)*e*my+e*e*b.y;
+    ctx.shadowColor=TYPE_COL[f.type]; ctx.shadowBlur=12; ctx.fillStyle=TYPE_COL[f.type]; ctx.beginPath(); ctx.arc(x,y,3.2,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+    return true;
+  });
+  // ajanlar
+  co.agents.forEach((a,i)=>{
+    if(!a) return; const ap=clamp((pn-a.appear)/350,0,1); if(ap<=0) return;
+    const r0=m.roster[i], col=P(r0.pid)?.color||'#aaaaaa', speaking=pn-a.lastAt<1400, sel=co.sel&&co.sel.kind==='agent'&&co.sel.i===i;
+    const r=(4.5+Math.min(3,a.count*0.35)+(speaking?2.5:0))*ap;
+    if(speaking){ ctx.shadowColor=col; ctx.shadowBlur=16; }
+    ctx.beginPath(); ctx.arc(a.x,a.y,r,0,Math.PI*2); ctx.fillStyle=col; ctx.fill(); ctx.shadowBlur=0;
+    if(a.lastType){ ctx.lineWidth=1.5; ctx.strokeStyle=TYPE_COL[a.lastType]; ctx.beginPath(); ctx.arc(a.x,a.y,r+2.5,0,Math.PI*2); ctx.stroke(); }
+    if(sel){ ctx.lineWidth=2; ctx.strokeStyle='#ffffff'; ctx.beginPath(); ctx.arc(a.x,a.y,r+5,0,Math.PI*2); ctx.stroke(); }
+    const ux=Math.cos(a.ang), uy=Math.sin(a.ang);
+    ctx.font=`${speaking||sel?700:500} 10px Inter, system-ui, sans-serif`; ctx.fillStyle=speaking||sel?'#ffffff':'rgba(220,214,255,.62)';
+    ctx.textAlign=ux>0.3?'left':ux<-0.3?'right':'center'; ctx.textBaseline=uy>0.3?'top':uy<-0.3?'bottom':'middle';
+    ctx.globalAlpha=ap; ctx.fillText(trunc(r0.ad,10),a.x+ux*(r+7),a.y+uy*(r+7)); ctx.globalAlpha=1;
+  });
+  // konuşma balonları
+  co.speech=co.speech.filter(s=>{
+    const t=pn-s.t0; if(t>s.dur) return false;
+    const a=co.agents[s.i]; if(!a||a.x==null) return true;
+    const alpha=Math.min(1,t/150)*Math.min(1,(s.dur-t)/400), maxW=Math.min(210,W*0.5);
+    ctx.font='500 11px Inter, system-ui, sans-serif';
+    const lines=wrapText(`${m.roster[s.i]?.ad}: ${s.text}`,maxW-16,2), lh=14;
+    const bw=Math.max(...lines.map(l=>ctx.measureText(l).width))+16, bh=lines.length*lh+10;
+    const bx=clamp(a.x+(cx-a.x)*0.3-bw/2,6,W-bw-6), by=clamp(a.y+(cy-a.y)*0.3-bh/2,6,H-bh-6);
+    ctx.globalAlpha=alpha; ctx.fillStyle='rgba(13,11,29,.94)'; ctx.strokeStyle=TYPE_COL[s.type]; ctx.lineWidth=1.2;
+    rr(bx,by,bw,bh,9); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#eeeaff'; ctx.textAlign='left'; ctx.textBaseline='top'; lines.forEach((l,k)=>ctx.fillText(l,bx+8,by+5+k*lh));
+    ctx.globalAlpha=1; return true;
+  });
+  // durum yazıları
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.font='700 10.5px Inter, system-ui, sans-serif'; ctx.fillStyle='rgba(238,234,255,.88)';
+  ctx.fillText(co.replay?'TEKRAR OYNATILIYOR':(m.pending?PHASE_TXT[m.phase]:PHASE_TXT[m.phase]||'')||'',12,10);
+  ctx.font='500 10.5px Inter, system-ui, sans-serif'; ctx.fillStyle='rgba(154,148,191,.85)';
+  ctx.fillText(`${m.roster.length} ajan · ${co.replay?co.flights.length+co.speech.length&&'…':m.events.length+' mesaj'} · ${co.tags.size} kavram`,12,25);
+  if(!m.roster.length){
+    const st=m.steps.find(s=>s.status==='run');
+    centerMsg(m.pending?'Göreve özel kadro araştırılıyor…':'Kadro oluşturulamadı', st&&st.chars?`${P(st.pid)?.name||''} · ${fmtK(st.chars)} karakter alındı`:(m.pending?'Görev analiz ediliyor':''));
+  }
+  if(W>=340){ ctx.font='600 10px Inter, system-ui, sans-serif'; let x=12; const y=H-14; ctx.textBaseline='middle';
+    TYPES.forEach(t=>{ ctx.fillStyle=TYPE_COL[t]; ctx.beginPath(); ctx.arc(x+4,y,3.5,0,Math.PI*2); ctx.fill(); ctx.fillStyle='rgba(154,148,191,.9)'; ctx.textAlign='left'; ctx.fillText(t,x+11,y); x+=ctx.measureText(t).width+24; }); }
+}
+
+/* ---------- görünüm 3: üretim bandı ---------- */
+function plLayout(m){
+  const n=m.stations.length, pad=16, slot=(W-pad*2)/Math.max(1,n), bw=Math.min(128,slot-10), bh=Math.min(92,H*0.34), beltY=Math.round(H*0.62);
+  return {n,pad,slot,bw,bh,beltY,top:beltY-bh-8,x:i=>pad+slot*i+slot/2};
+}
+function drawPipeline(now){
+  gridBg();
+  const m=live.pl;
+  if(!m){ centerMsg('Üretim bandı modunda bir iş ver','Göreve özel istasyonlar burada sıralanır'); return; }
+  const pn=performance.now(), st=m.stations||[];
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.font='700 10.5px Inter, system-ui, sans-serif'; ctx.fillStyle='rgba(238,234,255,.88)';
+  const doneN=st.filter(s=>s.status==='ok').length, act=st.findIndex(s=>s.status==='run');
+  ctx.fillText(`ÜRETİM BANDI${st.length?` · ${doneN}/${st.length}`:''}${act>=0?' · '+st[act].ad.toUpperCase():m.phase==='done'?' · TAMAMLANDI':m.phase==='stop'?' · DURDURULDU':m.phase==='err'?' · HATA':''}`,12,10);
+  if(!st.length){ const s0=m.steps[0]; centerMsg(m.pending?'Göreve özel bant tasarlanıyor…':'Bant kurulamadı', s0&&s0.chars?`${P(s0.pid)?.name||''} · ${fmtK(s0.chars)} karakter alındı`:''); return; }
+  const L=plLayout(m);
+  // bant: yalnızca bir istasyon çalışırken hareket eder
+  rr(L.pad-6,L.beltY,W-L.pad*2+12,12,6); ctx.fillStyle='#1a1636'; ctx.fill(); ctx.strokeStyle='#2b2552'; ctx.lineWidth=1; ctx.stroke();
+  ctx.save(); rr(L.pad-6,L.beltY,W-L.pad*2+12,12,6); ctx.clip();
+  const off2=act>=0?(pn*0.05)%16:0; ctx.fillStyle='#241e48'; for(let x=L.pad-22+off2;x<W;x+=16) ctx.fillRect(x,L.beltY,6,12); ctx.restore();
+  // istasyonlar
+  st.forEach((s,i)=>{
+    const x=L.x(i), p=P(s.pid), col=p?.color||'#888', lp=live.prov[s.pid];
+    const hot=s.status==='run'&&lp&&now-lp.lastDelta<160;
+    const sc2={wait:'#2b2552',run:col,ok:'#34d399',err:'#fb7185',stop:'#8e89b3'}[s.status||'wait'];
+    if(s.status==='run'){ ctx.shadowColor=col; ctx.shadowBlur=hot?24:12; }
+    rr(x-L.bw/2,L.top,L.bw,L.bh,11); ctx.fillStyle='#141129'; ctx.fill(); ctx.shadowBlur=0;
+    ctx.lineWidth=1.5; ctx.strokeStyle=sc2; ctx.stroke();
+    ctx.fillStyle=col; ctx.fillRect(x-L.bw/2+10,L.top,L.bw-20,3);
+    ctx.fillStyle='#2b2552'; ctx.fillRect(x-L.bw/2+12,L.top+L.bh,3,8); ctx.fillRect(x+L.bw/2-15,L.top+L.bh,3,8);
+    ctx.font='700 10px Inter, system-ui, sans-serif'; ctx.fillStyle='#8e89b3'; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText(String(i+1),x-L.bw/2+9,L.top+9);
+    ctx.textAlign='right'; ctx.fillStyle=rgba(col,.9); ctx.font='600 9.5px Inter, system-ui, sans-serif'; ctx.fillText(trunc(p?.name||'',12),x+L.bw/2-8,L.top+9);
+    ctx.font='700 12px Inter, system-ui, sans-serif'; ctx.fillStyle='#eeeaff'; ctx.textAlign='center';
+    const lines=wrapText(s.ad,L.bw-14,2); lines.forEach((l,k)=>ctx.fillText(l,x,L.top+L.bh/2-(lines.length*15)/2+k*15+2));
+    ctx.font='600 10.5px Inter, system-ui, sans-serif'; ctx.textBaseline='bottom';
+    const stt=s.status==='run'?(s.text?`${fmtK(s.text.length)} krk`:'başlıyor…'):s.status==='ok'?`✓ ${fmtMs(s.ms)}`:s.status==='err'?'hata':s.status==='stop'?'durdu':'bekliyor';
+    ctx.fillStyle=s.status==='ok'?'#34d399':s.status==='err'?'#fb7185':s.status==='run'?'#fbbf24':'#665f8c';
+    ctx.fillText(stt,x,L.top+L.bh-8);
+  });
+  // iş paketi
+  let px=null, pc='#ffffff';
+  if(live.plMove&&pn-live.plMove.t0<700){ const t=(pn-live.plMove.t0)/700, e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2, a=L.x(live.plMove.from), b=live.plMove.to>=L.n?W-L.pad:L.x(live.plMove.to); px=a+(b-a)*e; }
+  else if(act>=0){ px=L.x(act); pc=P(st[act].pid)?.color||'#ffffff'; }
+  else if(m.phase==='done'){ px=W-L.pad-4; pc='#34d399'; }
+  if(px!=null){ ctx.shadowColor=pc; ctx.shadowBlur=14; ctx.fillStyle=pc; ctx.fillRect(px-6,L.beltY-9,12,9); ctx.shadowBlur=0; ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(px-6,L.beltY-5,12,1); }
+  if(m.phase==='done'){ ctx.font='700 10px Inter, system-ui, sans-serif'; ctx.fillStyle='#34d399'; ctx.textAlign='right'; ctx.textBaseline='top'; ctx.fillText('ÇIKIŞ ✓',W-L.pad,L.beltY+18); }
+  // çalışan istasyonun canlı çıktısından son satır
+  if(act>=0&&st[act].text){ const tail=st[act].text.replace(/\s+/g,' ').slice(-140); ctx.font='12px "JetBrains Mono", monospace'; ctx.fillStyle='rgba(205,198,240,.75)'; ctx.textAlign='center'; ctx.textBaseline='top'; const ln=wrapText(tail,W-40,2); ln.forEach((l,k)=>ctx.fillText(l,W/2,L.beltY+34+k*16)); }
+}
+
+/* ---------- görünüm yönetimi ---------- */
+function latestOf(role){ const c=currentConv(); if(!c) return null; for(let i=c.msgs.length-1;i>=0;i--) if(c.msgs[i].role===role) return c.msgs[i]; return null; }
+function loadStageForConv(){
+  replayTok++;
+  const cm=latestOf('company');
+  if(!live.co||!cm||live.co.msgId!==cm.id){ live.co=cm?coBuild(cm):null; if(cm) cm.events.forEach(ev=>coEvent(ev,false)); }
+  const pm=latestOf('pipeline'); if(!live.pl||live.pl!==pm){ live.pl=pm; live.plMove=null; }
+  hideInfo(); lastDraw=0;
+}
+function setView(v){
+  live.view=v;
+  document.querySelectorAll('#tabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+  if(v==='company'&&!live.co){ const cm=latestOf('company'); if(cm){ live.co=coBuild(cm); cm.events.forEach(ev=>coEvent(ev,false)); } }
+  if(v==='pipeline'&&!live.pl) live.pl=latestOf('pipeline');
+  if(state.settings.stageCollapsed){ state.settings.stageCollapsed=false; applyStage(); save(); }
+  hideInfo(); lastDraw=0;
+}
+function setMax(on){
+  $('#app').classList.toggle('stage-max',on);
+  $('#stageMax').innerHTML=ic(on?'shrink':'expand');
+  $('#stageMax').setAttribute('aria-label',on?'Canlı ekranı küçült':'Canlı ekranı büyüt');
+  if(on&&state.settings.stageCollapsed){ state.settings.stageCollapsed=false; applyStage(); save(); }
+  if(!on) setTimeout(()=>scrollBottom(),50);
+  lastDraw=0;
+}
+document.querySelectorAll('#tabs .tab').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+$('#stageMax').addEventListener('click',()=>setMax(!$('#app').classList.contains('stage-max')));
+$('#stagePill').addEventListener('click',()=>{
+  const id=live.stagePill?.id; live.stagePill=null; setMax(false);
+  setTimeout(()=>{ const el=chat.querySelector(`[data-id="${id}"]`); if(el) el.scrollIntoView({block:'start',behavior:'smooth'}); },80);
+});
+function showInfo(html){ const el=$('#coInfo'); el.innerHTML=`<button class="icon-btn sm info-x" data-act="info-close" aria-label="Kapat">${ic('x')}</button>`+html; el.hidden=false; }
+function hideInfo(){ $('#coInfo').hidden=true; if(live.co) live.co.sel=null; }
+$('#coInfo').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  if(b.dataset.act==='info-close') hideInfo();
+  else if(b.dataset.act==='goto'){ const id=b.dataset.id; hideInfo(); setMax(false); setTimeout(()=>{ const el=chat.querySelector(`[data-id="${id}"]`); if(el) el.scrollIntoView({block:'start',behavior:'smooth'}); },80); }
+});
+cv.addEventListener('click',e=>{
+  const x=e.offsetX, y=e.offsetY;
+  if(live.view==='company'&&live.co){
+    const co=live.co, m=co.m;
+    const ai=co.agents.findIndex(a=>a&&a.x!=null&&Math.hypot(a.x-x,a.y-y)<16);
+    if(ai>=0){
+      const a=m.roster[ai], evs=m.events.filter(ev=>ev.i===ai).slice(-4);
+      co.sel={kind:'agent',i:ai};
+      showInfo(`<div class="ih"><span class="adot" style="background:${P(a.pid)?.color}"></span><b>${esc(a.ad)}</b> · ${esc(a.rol)}</div><div class="isub">${esc(P(a.pid)?.name||'')} canlandırıyor · ${co.agents[ai].count} mesaj</div>${a.neden?`<div class="itext">${esc(a.neden)}</div>`:''}${evs.map(ev=>tline(m,ev)).join('')}`);
+      lastDraw=0; return;
+    }
+    let hit=null; co.tags.forEach(n=>{ if(n.x!=null&&Math.hypot(n.x-x,n.y-y)<nodeR(n)+8) hit=n; });
+    if(hit){
+      const evs=m.events.filter(ev=>ev.tags.includes(hit.name)).slice(-6);
+      co.sel={kind:'tag',name:hit.name};
+      const rel=[...hit.links.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([t])=>esc(t));
+      showInfo(`<div class="ih"><b>#${esc(hit.name)}</b></div><div class="isub">${hit.count} kez geçti${rel.length?' · ilişkili: '+rel.join(', '):''}</div>${evs.map(ev=>tline(m,ev)).join('')}`);
+      lastDraw=0; return;
+    }
+    hideInfo(); lastDraw=0;
+  }else if(live.view==='pipeline'&&live.pl&&live.pl.stations.length){
+    const m=live.pl, L=plLayout(m);
+    const i=m.stations.findIndex((s,k)=>Math.abs(L.x(k)-x)<L.bw/2&&y>=L.top&&y<=L.top+L.bh);
+    if(i>=0){ const s=m.stations[i]; showInfo(`<div class="ih"><span class="idx">${i+1}</span><b>${esc(s.ad)}</b></div><div class="isub">${esc(P(s.pid)?.name||'')} · ${esc(s.model||'')}${s.ms?' · '+fmtMs(s.ms):''}</div><div class="itext">${esc(s.gorev)}</div>${s.text?`<div class="itext" style="white-space:pre-wrap">${esc(trunc(plain(s.text),420))}</div>`:''}<button class="act" data-act="goto" data-id="${m.id}">${ic('down')}<span>Sohbette aç</span></button>`); }
+    else hideInfo();
+  }
+});
 
 function updateStageHead(now){
   const sts=$('#sts');
@@ -1307,13 +2157,20 @@ function updateStageHead(now){
   const tps=tokRate();
   const html=tps?`<b class="live">${tps}</b> tok/sn`:`<span class="rl">Bugün </span><b>${todayTotal()}</b> istek`;
   if($('#rate').innerHTML!==html) $('#rate').innerHTML=html;
+  const pill=$('#stagePill'), maxOn=$('#app').classList.contains('stage-max');
+  const show=!!(live.stagePill&&maxOn);
+  if(pill.hidden===show){ pill.hidden=!show; }
+  if(show){ const h=`${ic('down')}${esc(live.stagePill.text)}`; if(pill.innerHTML!==h) pill.innerHTML=h; }
 }
-
 function resizeScene(){
   const r=cv.getBoundingClientRect(); W=r.width; H=r.height; if(!W||!H) return;
   DPR=Math.min(3,window.devicePixelRatio||1);
   cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
-  sc=Math.min(W/LW,H/LH); ox=(W-LW*sc)/2; oy=(H-LH*sc)/2; lastDraw=0;
+  if(W/H>LW/120){ sc=H/120; LHd=120; ox=(W-LW*sc)/2; oy=0; }
+  else{ sc=W/LW; LHd=Math.max(120,Math.floor(H/sc)); ox=0; oy=(H-LHd*sc)/2; }
+  DY=LHd-48;
+  if(off.height!==LHd) off.height=LHd;
+  lastDraw=0;
 }
 if(window.ResizeObserver) new ResizeObserver(resizeScene).observe(cv); else window.addEventListener('resize',resizeScene);
 
@@ -1322,17 +2179,18 @@ function loop(){
   const now=Date.now(), pn=performance.now();
   if(pn-lastHud>250){ lastHud=pn; updateStageHead(now); }
   if(document.hidden||state.settings.stageCollapsed||document.body.classList.contains('short')||!W) return;
-  const moving=live.inflight>0||live.packets.length||live.rings.length||now-live.typingAt<600||
-    PROVIDERS.some(p=>live.cooldown[p.id]>now||(live.prov[p.id].bubble&&live.prov[p.id].bubble.until>now));
+  let moving;
+  if(live.view==='company'){ const co=live.co; moving=!!co&&(co.flights.length>0||co.speech.length>0||co.energy>0.25||pn-co.lastEventAt<1500||co.m.pending||co.agents.some(a=>a&&pn-a.appear<400)); }
+  else if(live.view==='pipeline'){ const m=live.pl; moving=!!m&&(m.pending||(live.plMove&&pn-live.plMove.t0<800)); }
+  else moving=live.inflight>0||live.packets.length||live.rings.length||now-live.typingAt<600||PROVIDERS.some(p=>live.cooldown[p.id]>now||(live.prov[p.id].bubble&&live.prov[p.id].bubble.until>now));
   if(!moving&&pn-lastDraw<125) return;   // boştayken ~8 fps: pil dostu
-  lastDraw=pn; drawScene(now);
+  lastDraw=pn;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  if(live.view==='company') drawCompany(now); else if(live.view==='pipeline') drawPipeline(now); else drawOffice(now);
 }
 
-function applyStage(){
-  $('#stage').classList.toggle('collapsed',!!state.settings.stageCollapsed);
-  requestAnimationFrame(resizeScene);
-}
-$('#stageToggle').addEventListener('click',()=>{ state.settings.stageCollapsed=!state.settings.stageCollapsed; save(); applyStage(); });
+function applyStage(){ $('#stage').classList.toggle('collapsed',!!state.settings.stageCollapsed); requestAnimationFrame(resizeScene); }
+$('#stageToggle').addEventListener('click',()=>{ state.settings.stageCollapsed=!state.settings.stageCollapsed; if(state.settings.stageCollapsed) setMax(false); save(); applyStage(); });
 function checkShort(){ document.body.classList.toggle('short',window.innerHeight<520); }
 window.addEventListener('resize',checkShort);
 
@@ -1340,7 +2198,7 @@ window.addEventListener('resize',checkShort);
    BAŞLAT
    ===================================================================== */
 $('#menuBtn').innerHTML=ic('menu'); $('#newBtn').innerHTML=ic('plus'); $('#settingsBtn').innerHTML=ic('sliders');
-$('#stageToggle').innerHTML=ic('chev').replace('class="ic"','class="ic chev"');
+$('#stageToggle').innerHTML=ic('chev').replace('class="ic"','class="ic chev"'); $('#stageMax').innerHTML=ic('expand');
 $('#attachBtn').innerHTML=ic('clip'); $('#micBtn').innerHTML=ic('mic'); $('#attachX').innerHTML=ic('x');
 $('#drawerNew').innerHTML=ic('plus')+'Yeni'; $('#drawerClose').innerHTML=ic('x'); $('#sheetClose').innerHTML=ic('x');
 document.querySelectorAll('[data-icon]').forEach(el=>{ el.outerHTML=ic(el.dataset.icon); });
@@ -1352,7 +2210,7 @@ $('#settingsBtn').addEventListener('click',openSheet);
 $('#sheetClose').addEventListener('click',closeSheet);
 
 if(!currentConv()) state.currentId=state.convs[0]?.id||null;
-checkShort(); applyStage(); renderAll(); setSendUI(); autoGrow();
+checkShort(); applyStage(); renderAll(); setSendUI(); autoGrow(); setView('office');
 requestAnimationFrame(loop);
 document.fonts&&document.fonts.load('8px "Press Start 2P"').then(()=>{ lastDraw=0; }).catch(()=>{});
 setTimeout(autoRefreshModels,1200);
