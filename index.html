@@ -279,6 +279,10 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const now=()=>new Date().toTimeString().slice(0,8);
 
+/* ============ YARDIMCILAR ============ */
+function curModel(p){ const m=state.models[p.id]; return p.models.includes(m)?m:p.models[0]; }
+function avgLat(id){ const a=lat[id]; return a.length?a.reduce((x,y)=>x+y,0)/a.length:Infinity; }
+
 /* ============ LOG ============ */
 function log(kind,msg){
   const el=document.createElement('div');
@@ -312,7 +316,7 @@ function spark(p){
 function renderAgents(){
   $('agents').innerHTML = PROVIDERS.map(p=>{
     const hasKey=!!state.keys[p.id];
-    const model=state.models[p.id]||p.models[0];
+    const model=curModel(p);
     const last=lat[p.id].slice(-1)[0];
     const ledCls=busy[p.id]?'busy':hasKey?'ok':'';
     return `
@@ -533,7 +537,7 @@ function updateStats(){
 async function callProvider(p,prompt){
   const key=state.keys[p.id];
   if(!key) throw new Error(`${p.name} anahtarı yok. "Anahtarlar" bölümünden ekle.`);
-  const model=state.models[p.id]||p.models[0];
+  const model=curModel(p);
   const res=await fetch(`${p.base}/chat/completions`,{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
@@ -541,6 +545,7 @@ async function callProvider(p,prompt){
   });
   if(!res.ok){
     let detail=''; try{ detail=(await res.json()).error?.message||''; }catch{}
+    if(res.status===404) detail=(detail||'Model bulunamadı')+' · Model kaldırılmış olabilir, kartta başka model seç.';
     throw new Error(`${p.name} ${res.status}: ${detail||res.statusText}`);
   }
   const data=await res.json();
@@ -563,7 +568,7 @@ function typingBubble(p,parent){
 
 async function askOne(p,prompt,bubble){
   busy[p.id]=true; renderAgents(); sendPacket(PROVIDERS.indexOf(p));
-  log('req',`→ ${p.name} · ${state.models[p.id]||p.models[0]}`);
+  log('req',`→ ${p.name} · ${curModel(p)}`);
   const t0=performance.now();
   try{
     const r=await callProvider(p,prompt);
@@ -617,8 +622,19 @@ async function send(){
         if(tg){ const m=document.createElement('span'); m.textContent=medals[k]; tg.insertBefore(m,tg.firstChild); }
         log('ok',`${medals[k]} ${withKey[r.i].name} en hızlı (${r.ms} ms)`);
       });
+    }else if(target==='auto'){
+      const order=[...withKey].sort((a,b)=>avgLat(a.id)-avgLat(b.id));
+      let done=false;
+      for(const p of order){
+        const bubble=typingBubble(p);
+        const r=await askOne(p,prompt,bubble);
+        if(r.ok){ done=true; break; }
+        bubble.remove();
+        log('sys',`${p.name} başarısız, sıradakine geçiliyor`);
+      }
+      if(!done) addMsg('Hiçbir sağlayıcı yanıt veremedi. Log paneline bak.','bot err');
     }else{
-      let p=target==='auto'?(withKey.find(x=>x.id==='groq')||withKey[0]):withKey.find(x=>x.id===target);
+      const p=withKey.find(x=>x.id===target);
       if(!p){ addMsg(`${PROVIDERS.find(x=>x.id===target).name} anahtarı yok.`,'bot err'); return; }
       await askOne(p,prompt,typingBubble(p));
     }
