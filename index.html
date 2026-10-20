@@ -18,7 +18,7 @@
     background:radial-gradient(120% 60% at 50% -10%,#2a0b3d 0%,transparent 60%),
                radial-gradient(90% 50% at 100% 100%,#082a33 0%,transparent 60%),var(--bg);
     color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    display:flex;flex-direction:column;min-height:100vh;padding-bottom:160px;
+    display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;
   }
   body::after{ /* hafif tarama çizgisi */
     content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;
@@ -113,7 +113,7 @@
   .ln.ok{color:var(--green)} .ln.err{color:#ff7ab8} .ln.req{color:var(--cyan)} .ln.sys{color:var(--violet)}
 
   /* ---------- SOHBET ---------- */
-  #chat{flex:none;height:42vh;min-height:200px;overflow-y:auto;padding:12px 12px 6px;display:flex;flex-direction:column;gap:10px}
+  #chat{flex:1 1 0;min-height:140px;overflow-y:auto;padding:12px 12px 6px;display:flex;flex-direction:column;gap:10px}
   .empty{margin:auto;text-align:center;color:var(--dim);font-size:13px;line-height:1.6;padding:12px}
   .empty b{color:var(--text);font-size:15px;display:block;margin-bottom:4px}
   .msg{max-width:86%;padding:10px 12px;border-radius:16px;font-size:14px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;animation:pop .28s ease-out}
@@ -133,7 +133,7 @@
 
   /* ---------- ALT BAR ---------- */
   footer{
-    position:fixed;left:0;right:0;bottom:0;z-index:5;
+    flex:none;
     padding:10px 12px calc(10px + env(safe-area-inset-bottom));
     background:linear-gradient(180deg,rgba(18,14,34,.6),rgba(10,8,22,.95));border-top:1px solid var(--line);
   }
@@ -174,9 +174,10 @@
   .sheet .btn.primary{background:linear-gradient(135deg,#ff2d95,#a855f7);box-shadow:0 6px 18px -6px #ff2d95}
 
   @media (max-width:480px){
-    .stage{height:150px;margin:8px 10px 0}
+    .stage{height:120px;margin:8px 10px 0}
     .pair{display:none}
-    #chat{height:52vh}
+    .a-spark,.a-row{display:none}
+    .agent{padding:6px 8px}
     .agents{gap:6px;padding:10px 10px 4px}
     .agent{padding:8px}
     .agent select{font-size:10px}
