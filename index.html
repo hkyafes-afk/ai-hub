@@ -190,6 +190,15 @@
     #log{height:64px}
     .msg{max-width:94%}
   }
+  .copy{margin-left:6px;background:rgba(255,255,255,.06);border:0;color:var(--text);border-radius:6px;padding:2px 7px;font-size:12px;cursor:pointer}
+  .codeblock{background:#07050f;border:1px solid var(--line);border-radius:10px;margin:6px 0;overflow:hidden}
+  .cbar{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;font-size:10px;color:var(--dim);background:#110d24}
+  .codeblock pre{margin:0;padding:8px;overflow-x:auto;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#d9d3f5;white-space:pre}
+  .ic{background:#1d1638;border-radius:4px;padding:0 4px;font:12px ui-monospace,Menlo,monospace}
+  .hd{display:block;margin-top:4px;color:var(--cyan)}
+  .body{white-space:pre-wrap}
+  .mic{flex:none;width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:#0c0a1a;color:#fff;font-size:18px;cursor:pointer}
+  .mic.live{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,45,149,.45)}
 </style>
 </head>
 <body>
@@ -201,6 +210,8 @@
   </div>
   <div class="hright">
     <span class="clock" id="clock">--:--</span>
+    <button class="btn" id="exportChat" title="Sohbeti indir">⤓</button>
+    <button class="btn" id="clearChat">Temizle</button>
     <button class="btn" id="openSettings">Anahtarlar</button>
   </div>
 </header>
@@ -228,8 +239,10 @@
 <section id="chat"><div class="empty" id="emptyMsg"><b>Hazır.</b>Bir soru yaz ya da hepsine birden sor.</div></section>
 
 <footer>
+  <div class="targets" id="tasks"></div>
   <div class="targets" id="targets"></div>
   <div class="inputrow">
+    <button id="mic" class="mic" title="Sesle yaz">🎤</button>
     <textarea id="input" placeholder="Bir şey yaz..."></textarea>
     <button id="send">Gönder</button>
   </div>
@@ -271,9 +284,17 @@ const persist=()=>{ try{localStorage.setItem(STORE,JSON.stringify(state))}catch{
 const state=load();
 state.keys=state.keys||{}; state.models=state.models||{};
 state.stats=state.stats||{req:0,tok:0,err:0};
+state.history=state.history||[];
 const lat={}; PROVIDERS.forEach(p=>lat[p.id]=[]);       // gecikme geçmişi (bellekte)
-const busy={}; const tokHist=[0];
+const busy={}; const lastErr={}; const tokHist=[0];
 let target='auto';
+let task='genel';
+const TASKS=[
+  {id:'genel', label:'Genel', sys:''},
+  {id:'kod',   label:'Kod',   sys:'Sen uzman bir yazılımcısın. Kısa ve çalışan kod ver, kodu kısaca açıkla.'},
+  {id:'ceviri',label:'Çeviri',sys:'Verilen metni doğal ve akıcı biçimde çevir. Sadece çeviriyi yaz.'},
+  {id:'ozet',  label:'Özet',  sys:'Verilen metni en fazla 5 madde ile özetle.'}
+];
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -318,7 +339,7 @@ function renderAgents(){
     const hasKey=!!state.keys[p.id];
     const model=curModel(p);
     const last=lat[p.id].slice(-1)[0];
-    const ledCls=busy[p.id]?'busy':hasKey?'ok':'';
+    const ledCls=busy[p.id]?'busy':lastErr[p.id]?'err':hasKey?'ok':'';
     return `
     <div class="agent" style="--c:${p.color}">
       <div class="a-head">
@@ -345,6 +366,12 @@ function renderTargets(){
   const opts=[['auto','Otomatik'],['all','Hepsi · karşılaştır'],...PROVIDERS.map(p=>[p.id,p.name])];
   $('targets').innerHTML=opts.map(([id,label])=>`<button class="tgt ${target===id?'on':''}" data-t="${id}">${label}</button>`).join('');
   $('targets').querySelectorAll('.tgt').forEach(b=>b.onclick=()=>{ target=b.dataset.t; renderTargets(); });
+}
+
+/* ============ GÖREV SEÇİMİ ============ */
+function renderTasks(){
+  $('tasks').innerHTML=TASKS.map(x=>`<button class="tgt ${task===x.id?'on':''}" data-k="${x.id}">${x.label}</button>`).join('');
+  $('tasks').querySelectorAll('.tgt').forEach(b=>b.onclick=()=>{ task=b.dataset.k; renderTasks(); });
 }
 
 /* ============ PİKSEL OFİS SAHNESİ (canvas) ============ */
@@ -533,27 +560,89 @@ function updateStats(){
   animateBalance(); drawChart(); persist();
 }
 
-/* ============ API ÇAĞRISI (OpenAI uyumlu) ============ */
-async function callProvider(p,prompt){
+/* ============ API ÇAĞRISI (OpenAI uyumlu, akışlı) ============ */
+function buildMsgs(prompt,useHistory){
+  const msgs=[];
+  const sys=TASKS.find(x=>x.id===task)?.sys;
+  if(sys) msgs.push({role:'system',content:sys});
+  if(useHistory) msgs.push(...state.history.slice(-12));
+  msgs.push({role:'user',content:prompt});
+  return msgs;
+}
+async function callProvider(p,msgs,onDelta){
   const key=state.keys[p.id];
   if(!key) throw new Error(`${p.name} anahtarı yok. "Anahtarlar" bölümünden ekle.`);
   const model=curModel(p);
   const res=await fetch(`${p.base}/chat/completions`,{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
-    body:JSON.stringify({model,messages:[{role:'user',content:prompt}]})
+    body:JSON.stringify({model,messages:msgs,stream:true})
   });
   if(!res.ok){
     let detail=''; try{ detail=(await res.json()).error?.message||''; }catch{}
     if(res.status===404) detail=(detail||'Model bulunamadı')+' · Model kaldırılmış olabilir, kartta başka model seç.';
     throw new Error(`${p.name} ${res.status}: ${detail||res.statusText}`);
   }
-  const data=await res.json();
-  return { text:data.choices?.[0]?.message?.content||'(boş yanıt)', tok:data.usage?.total_tokens||0, model };
+  const reader=res.body.getReader(); const dec=new TextDecoder();
+  let buf='', text='', tok=0;
+  while(true){
+    const {done,value}=await reader.read();
+    if(done) break;
+    buf+=dec.decode(value,{stream:true});
+    const lines=buf.split('\n'); buf=lines.pop();
+    for(const line of lines){
+      const l=line.trim();
+      if(!l.startsWith('data:')) continue;
+      const data=l.slice(5).trim();
+      if(!data||data==='[DONE]') continue;
+      try{
+        const j=JSON.parse(data);
+        const d=j.choices?.[0]?.delta?.content;
+        if(d){ text+=d; if(onDelta) onDelta(text); }
+        if(j.usage?.total_tokens) tok=j.usage.total_tokens;
+      }catch{}
+    }
+  }
+  if(!text) text='(boş yanıt)';
+  return { text, tok: tok||Math.ceil(text.length/4), model };
+}
+function md(src){
+  return src.split('```').map((seg,i)=>{
+    if(i%2===1){
+      const nl=seg.indexOf('\n');
+      const lang=nl>-1?seg.slice(0,nl).trim():'';
+      const code=(nl>-1?seg.slice(nl+1):seg).replace(/\n$/,'');
+      return `<div class="codeblock"><div class="cbar"><span>${esc(lang||'kod')}</span><button class="copy ccopy">⧉ Kopyala</button></div><pre><code>${esc(code)}</code></pre></div>`;
+    }
+    return esc(seg)
+      .replace(/`([^`\n]+)`/g,'<code class="ic">$1</code>')
+      .replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>')
+      .replace(/^#{1,3} (.+)$/gm,'<b class="hd">$1</b>')
+      .replace(/^[-*] (.+)$/gm,'• $1');
+  }).join('');
 }
 
 /* ============ SOHBET ============ */
 const chatEl=$('chat');
+function saveChat(){
+  try{
+    const c=chatEl.cloneNode(true);
+    c.querySelectorAll('.typing').forEach(x=>x.closest('.msg')?.remove());
+    const h=c.innerHTML;
+    state.chatHtml=h.length<150000?h:'';
+    persist();
+  }catch{}
+}
+function restoreChat(){
+  chatEl.innerHTML = state.chatHtml || '<div class="empty" id="emptyMsg"><b>Hazır.</b>Bir soru yaz ya da hepsine birden sor.</div>';
+}
+chatEl.addEventListener('click',e=>{
+  const b=e.target.closest('.copy'); if(!b) return;
+  const isCode=b.classList.contains('ccopy');
+  const text=isCode?(b.closest('.codeblock')?.querySelector('code')?.textContent||''):(b.closest('.msg')?.dataset.text||'');
+  try{ navigator.clipboard.writeText(text); }catch{}
+  b.textContent='✓'; setTimeout(()=>b.textContent=isCode?'⧉ Kopyala':'⧉',1200);
+});
 function clearEmpty(){ const e=$('emptyMsg'); if(e) e.remove(); }
 function addMsg(html,cls,parent=chatEl,style=''){
   clearEmpty();
@@ -566,36 +655,45 @@ function typingBubble(p,parent){
   return addMsg(`<div class="tag" style="--c:${p.color}">${p.glyph} ${p.name} <em>düşünüyor</em></div><div class="typing" style="--c:${p.color}"><i></i><i></i><i></i></div>`,'bot',parent,`--c:${p.color}`);
 }
 
-async function askOne(p,prompt,bubble){
+function bubbleInner(p,r){
+  const tag=r.ok
+    ? `<div class="tag" style="--c:${p.color}">${p.glyph} ${p.name} <em>${esc(r.model||'')}</em>${r.ms!=null?`<span class="ms">${r.ms} ms</span>`:''}<button class="copy" title="Kopyala">⧉</button></div>`
+    : `<div class="tag" style="--c:${p.color}">${p.glyph} ${p.name}</div>`;
+  return tag+`<div class="body">${r.ok?md(r.text):esc(r.text)}</div>`;
+}
+function fillBubble(el,p,r){
+  el.classList.toggle('err',!r.ok);
+  el.innerHTML=bubbleInner(p,r);
+  el.dataset.text=r.text||'';
+}
+async function askOne(p,prompt,bubble,single){
   busy[p.id]=true; renderAgents(); sendPacket(PROVIDERS.indexOf(p));
-  log('req',`→ ${p.name} · ${curModel(p)}`);
+  log('req',`→ ${p.name} · ${curModel(p)}${single?' (akış)':''}`);
   const t0=performance.now();
   try{
-    const r=await callProvider(p,prompt);
+    const msgs=buildMsgs(prompt,single);
+    const onDelta=single?(txt=>fillBubble(bubble,p,{ok:true,text:txt,model:curModel(p),ms:null})):null;
+    const r=await callProvider(p,msgs,onDelta);
     const ms=Math.round(performance.now()-t0);
     lat[p.id].push(ms); if(lat[p.id].length>40) lat[p.id].shift();
+    lastErr[p.id]=false;
     state.stats.req++; state.stats.tok+=r.tok; tokHist.push(state.stats.tok);
     log('ok',`✓ ${p.name} · ${ms} ms · ${r.tok} token`);
     returnPacket(PROVIDERS.indexOf(p),()=>rings.push({x:hubC.x,y:hubC.y,age:0,c:p.color}));
     fillBubble(bubble,p,{ok:true,text:r.text,model:r.model,ms});
+    if(single){
+      state.history.push({role:'user',content:prompt},{role:'assistant',content:r.text});
+      state.history=state.history.slice(-20);
+    }
     return {ok:true,ms};
   }catch(e){
+    lastErr[p.id]=true;
     state.stats.err++;
     log('err',`✗ ${p.name}: ${e.message}`);
     fillBubble(bubble,p,{ok:false,text:e.message});
     return {ok:false,ms:null};
   }finally{
     busy[p.id]=false; renderAgents(); updateStats();
-  }
-}
-
-function fillBubble(el,p,r){
-  if(r.ok){
-    el.classList.remove('err');
-    el.innerHTML=`<div class="tag" style="--c:${p.color}">${p.glyph} ${p.name} <em>${esc(r.model)}</em><span class="ms">${r.ms} ms</span></div>${esc(r.text)}`;
-  }else{
-    el.classList.add('err');
-    el.innerHTML=`<div class="tag" style="--c:${p.color}">${p.glyph} ${p.name}</div>${esc(r.text)}`;
   }
 }
 
@@ -615,7 +713,7 @@ async function send(){
     if(target==='all'){
       const row=document.createElement('div'); row.className='compare'; chatEl.appendChild(row);
       const bubbles=withKey.map(p=>typingBubble(p,row));
-      const results=await Promise.all(withKey.map((p,i)=>askOne(p,prompt,bubbles[i])));
+      const results=await Promise.all(withKey.map((p,i)=>askOne(p,prompt,bubbles[i],false)));
       const medals=['🥇','🥈','🥉'];
       results.map((r,i)=>({...r,i})).filter(r=>r.ok).sort((a,b)=>a.ms-b.ms).slice(0,3).forEach((r,k)=>{
         const tg=bubbles[r.i].querySelector('.tag');
@@ -627,7 +725,7 @@ async function send(){
       let done=false;
       for(const p of order){
         const bubble=typingBubble(p);
-        const r=await askOne(p,prompt,bubble);
+        const r=await askOne(p,prompt,bubble,true);
         if(r.ok){ done=true; break; }
         bubble.remove();
         log('sys',`${p.name} başarısız, sıradakine geçiliyor`);
@@ -636,10 +734,10 @@ async function send(){
     }else{
       const p=withKey.find(x=>x.id===target);
       if(!p){ addMsg(`${PROVIDERS.find(x=>x.id===target).name} anahtarı yok.`,'bot err'); return; }
-      await askOne(p,prompt,typingBubble(p));
+      await askOne(p,prompt,typingBubble(p),true);
     }
   }finally{
-    $('send').disabled=false; persist();
+    $('send').disabled=false; saveChat();
   }
 }
 $('send').onclick=send;
@@ -655,6 +753,21 @@ function openSettings(){
   modal.classList.add('show');
 }
 $('openSettings').onclick=openSettings;
+$('clearChat').onclick=()=>{ state.chatHtml=''; state.history=[]; restoreChat(); persist(); };
+$('exportChat').onclick=()=>{
+  const txt=state.history.length?state.history.map(m=>(m.role==='user'?'Sen: ':'Asistan: ')+m.content).join('\n\n'):'Sohbet boş.';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+  a.download='aihub-sohbet.txt'; document.body.appendChild(a); a.click(); a.remove();
+};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(SR){
+  const rec=new SR(); rec.lang='tr-TR'; rec.interimResults=true; rec.continuous=false;
+  let base='';
+  rec.onresult=e=>{ let x=''; for(const r of e.results) x+=r[0].transcript; $('input').value=(base+' '+x).trim(); };
+  rec.onend=()=>$('mic').classList.remove('live');
+  $('mic').onclick=()=>{ base=$('input').value; try{ rec.start(); $('mic').classList.add('live'); }catch{} };
+} else { $('mic').style.display='none'; }
 $('cancelSettings').onclick=()=>modal.classList.remove('show');
 $('saveSettings').onclick=()=>{
   modal.querySelectorAll('input[data-key]').forEach(i=>{
@@ -669,7 +782,7 @@ function tick(){ $('clock').textContent=new Date().toLocaleTimeString('tr-TR',{h
 setInterval(tick,1000); tick();
 
 /* ============ BAŞLAT ============ */
-renderAgents(); renderTargets(); updateStats();
+renderAgents(); renderTargets(); renderTasks(); restoreChat(); updateStats();
 resizeNet(); drawChart(); drawNet();
 log('sys','sistem hazır · ağ bağlandı');
 if(!Object.keys(state.keys).length) openSettings();
