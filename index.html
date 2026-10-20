@@ -18,7 +18,7 @@
     background:radial-gradient(120% 60% at 50% -10%,#2a0b3d 0%,transparent 60%),
                radial-gradient(90% 50% at 100% 100%,#082a33 0%,transparent 60%),var(--bg);
     color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    display:flex;flex-direction:column;overflow:hidden;min-height:100vh;
+    display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100dvh;
   }
   body::after{ /* hafif tarama çizgisi */
     content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;
@@ -49,7 +49,7 @@
   .btn:active{transform:scale(.96)}
 
   /* ---------- AJAN KARTLARI ---------- */
-  .agents{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px 12px 4px}
+  .agents{flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px 12px 4px}
   .agent{
     position:relative;overflow:hidden;border-radius:14px;padding:10px;background:var(--panel);
     border:1px solid var(--c,#333);box-shadow:0 0 22px -10px var(--c),inset 0 1px 0 rgba(255,255,255,.04);
@@ -88,7 +88,7 @@
   @keyframes scan{0%{transform:translateX(-100%)}100%{transform:translateX(150%)}}
 
   /* ---------- AĞ SAHNESİ ---------- */
-  .stage{position:relative;margin:10px 12px 0;height:270px;border-radius:18px;overflow:hidden;border:1px solid var(--line);
+  .stage{flex:none;position:relative;margin:10px 12px 0;height:270px;border-radius:18px;overflow:hidden;border:1px solid var(--line);
     background:radial-gradient(circle at 50% 50%,#1d0f3d 0%,#0a0718 65%,#05040b 100%)}
   .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   .chip{
@@ -100,7 +100,7 @@
   #chipBR{right:10px;bottom:10px;color:var(--green)}
 
   /* ---------- BAKİYE + LOG ---------- */
-  .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px 0}
+  .pair{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px 0}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;min-width:0;position:relative;overflow:hidden}
   .p-title{font-size:9.5px;letter-spacing:1.5px;color:var(--dim);display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
   .p-title span:first-child{color:var(--text)}
@@ -113,7 +113,7 @@
   .ln.ok{color:var(--green)} .ln.err{color:#ff7ab8} .ln.req{color:var(--cyan)} .ln.sys{color:var(--violet)}
 
   /* ---------- SOHBET ---------- */
-  #chat{flex:1;overflow-y:auto;padding:12px 12px 6px;display:flex;flex-direction:column;gap:10px;min-height:120px}
+  #chat{flex:1 1 0;min-height:0;overflow-y:auto;padding:12px 12px 6px;display:flex;flex-direction:column;gap:10px}
   .empty{margin:auto;text-align:center;color:var(--dim);font-size:13px;line-height:1.6;padding:12px}
   .empty b{color:var(--text);font-size:15px;display:block;margin-bottom:4px}
   .msg{max-width:86%;padding:10px 12px;border-radius:16px;font-size:14px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;animation:pop .28s ease-out}
@@ -133,6 +133,7 @@
 
   /* ---------- ALT BAR ---------- */
   footer{
+    flex:none;
     padding:10px 12px calc(10px + env(safe-area-inset-bottom));
     background:linear-gradient(180deg,rgba(18,14,34,.6),rgba(10,8,22,.95));border-top:1px solid var(--line);
   }
@@ -173,9 +174,18 @@
   .sheet .btn.primary{background:linear-gradient(135deg,#ff2d95,#a855f7);box-shadow:0 6px 18px -6px #ff2d95}
 
   @media (max-width:480px){
-    .pair{grid-template-columns:1fr}
+    .stage{height:190px;margin:8px 10px 0}
+    .agents{gap:6px;padding:10px 10px 4px}
+    .agent{padding:8px}
     .agent select{font-size:10px}
     .a-role{display:none}
+    .a-spark{height:22px}
+    .pair{gap:6px;padding:8px 10px 0}
+    .panel{padding:8px}
+    .balance{font-size:18px}
+    #chart{height:40px}
+    #log{height:64px}
+    .msg{max-width:94%}
   }
 </style>
 </head>
