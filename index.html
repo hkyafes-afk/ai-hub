@@ -286,10 +286,6 @@ const PROVIDERS = [
     base:'https://integrate.api.nvidia.com/v1', keyUrl:'https://build.nvidia.com/settings/api-keys',
     models:['deepseek-ai/deepseek-v3.1','meta/llama-3.1-70b-instruct','moonshotai/kimi-k2'],
     limit:'~1000 ücretsiz kredi · 40/dk' },
-  { id:'mistral', name:'Mistral', glyph:'≋', color:'#ff7000', role:'AVRUPA',
-    base:'https://api.mistral.ai/v1', keyUrl:'https://console.mistral.ai/api-keys',
-    models:['mistral-small-latest','mistral-large-latest'],
-    limit:'Experiment planı · telefon doğrulama' }
 ];
 
 /* ============ DURUM ============ */
@@ -301,7 +297,7 @@ state.keys=state.keys||{}; state.models=state.models||{};
 state.stats=state.stats||{req:0,tok:0,err:0};
 state.history=state.history||[];
 const lat={}; PROVIDERS.forEach(p=>lat[p.id]=[]);       // gecikme geçmişi (bellekte)
-const busy={}; const lastErr={}; const tokHist=[0];
+const busy={}; const lastErr={}; let lastFailText=''; const tokHist=[0];
 let target='auto';
 let task='genel';
 const TASKS=[
@@ -590,11 +586,16 @@ async function callProvider(p,msgs,onDelta){
   const key=state.keys[p.id];
   if(!key) throw new Error(`${p.name} anahtarı yok. "Anahtarlar" bölümünden ekle.`);
   const model=curModel(p);
-  const res=await fetch(`${p.base}/chat/completions`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
-    body:JSON.stringify({model,messages:msgs,stream:true})
-  });
+  let res;
+  try{
+    res=await fetch(`${p.base}/chat/completions`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+      body:JSON.stringify({model,messages:msgs,stream:true})
+    });
+  }catch{
+    throw new Error(`${p.name}: tarayıcıdan bağlantı kurulamadı (CORS veya ağ engeli). Bu sağlayıcı tarayıcı isteklerine izin vermiyor olabilir.`);
+  }
   if(!res.ok){
     let detail=''; try{ detail=(await res.json()).error?.message||''; }catch{}
     if(res.status===404) detail=(detail||'Model bulunamadı')+' · Model kaldırılmış olabilir, kartta başka model seç.';
@@ -704,7 +705,7 @@ async function askOne(p,prompt,bubble,single){
     }
     return {ok:true,ms};
   }catch(e){
-    lastErr[p.id]=true;
+    lastErr[p.id]=true; lastFailText=e.message;
     state.stats.err++;
     log('err',`✗ ${p.name}: ${e.message}`);
     fillBubble(bubble,p,{ok:false,text:e.message});
@@ -747,7 +748,7 @@ async function send(){
         bubble.remove();
         log('sys',`${p.name} başarısız, sıradakine geçiliyor`);
       }
-      if(!done) addMsg('Hiçbir sağlayıcı yanıt veremedi. Log paneline bak.','bot err');
+      if(!done) addMsg(`Hiçbir sağlayıcı yanıt veremedi.\n${lastFailText}`,'bot err');
     }else{
       const p=withKey.find(x=>x.id===target);
       if(!p){ addMsg(`${PROVIDERS.find(x=>x.id===target).name} anahtarı yok.`,'bot err'); return; }
