@@ -89,7 +89,7 @@
 
   /* ---------- AĞ SAHNESİ ---------- */
   .stage{flex:none;position:relative;margin:10px 12px 0;height:270px;border-radius:18px;overflow:hidden;border:1px solid var(--line);
-    background:radial-gradient(circle at 50% 50%,#1d0f3d 0%,#0a0718 65%,#05040b 100%)}
+    background:#07050f}
   .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   .chip{
     position:absolute;z-index:1;font-size:10px;letter-spacing:1px;padding:4px 8px;border-radius:999px;
@@ -174,7 +174,7 @@
   .sheet .btn.primary{background:linear-gradient(135deg,#ff2d95,#a855f7);box-shadow:0 6px 18px -6px #ff2d95}
 
   @media (max-width:480px){
-    .stage{height:120px;margin:8px 10px 0}
+    .stage{height:150px;margin:8px 10px 0}
     .pair{display:none}
     .a-spark,.a-row{display:none}
     .agent{padding:6px 8px}
@@ -343,128 +343,152 @@ function renderTargets(){
   $('targets').querySelectorAll('.tgt').forEach(b=>b.onclick=()=>{ target=b.dataset.t; renderTargets(); });
 }
 
-/* ============ AĞ SAHNESİ (canvas) ============ */
+/* ============ PİKSEL OFİS SAHNESİ (canvas) ============ */
 const cv=$('net'), ctx=cv.getContext('2d');
-let W=0,H=0,DPR=1,hub,provNodes=[],sats=[],stars=[],packets=[],rings=[],t=0;
+const LW=200, LH=110;                       // mantıksal piksel ızgarası
+let W=0,H=0,DPR=1,sc=1,ox=0,oy=0,t=0;
+const DESKS=[{x:10,y:66},{x:78,y:66},{x:146,y:66}];
+const hubC={x:100,y:28};
+let provC=[], packets=[], rings=[];
 
 function resizeNet(){
   DPR=window.devicePixelRatio||1;
   const r=cv.getBoundingClientRect(); W=r.width; H=r.height;
-  cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
-  hub={x:W/2,y:H/2};
-  const R=Math.min(W,H)*0.34;
-  provNodes=PROVIDERS.map((p,i)=>({p,a:-Math.PI/2+i*(2*Math.PI/PROVIDERS.length),R}));
-  sats=Array.from({length:16},(_,i)=>({
-    x:Math.random()*W, y:Math.random()*H, r:1+Math.random()*2.2,
-    c:PROVIDERS[i%PROVIDERS.length].color, ph:Math.random()*6.28, vx:(Math.random()-.5)*.12, vy:(Math.random()-.5)*.12
-  }));
-  stars=Array.from({length:70},()=>({x:Math.random()*W,y:Math.random()*H,s:Math.random()*1.2+.2,ph:Math.random()*6.28}));
+  cv.width=W*DPR; cv.height=H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.imageSmoothingEnabled=false;
+  sc=Math.min(W/LW,H/LH); ox=(W-LW*sc)/2; oy=(H-LH*sc)/2;
+  provC=DESKS.map(d=>({x:d.x+21,y:d.y+6}));
 }
 window.addEventListener('resize',()=>{ resizeNet(); drawChart(); });
 
-function provPos(n){
-  const ang=n.a+t*0.0004;
-  return {x:hub.x+Math.cos(ang)*n.R, y:hub.y+Math.sin(ang)*n.R*0.85};
+const sx=x=>ox+x*sc, sy=y=>oy+y*sc;
+function R(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(sx(x),sy(y),w*sc,h*sc); }
+function T(s,x,y,c,size){
+  ctx.fillStyle=c; ctx.font=`bold ${Math.max(7,size*sc)}px ui-monospace,Menlo,monospace`;
+  ctx.textAlign='center'; ctx.fillText(s,sx(x),sy(y));
 }
-function bez(a,b,k){ // eğri bağlantı üzerinde nokta
-  const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
-  const dx=b.x-a.x, dy=b.y-a.y;
-  const cx=mx-dy*0.22, cy=my+dx*0.22;
-  const u=1-k;
-  return {x:u*u*a.x+2*u*k*cx+k*k*b.x, y:u*u*a.y+2*u*k*cy+k*k*b.y, cx, cy};
+
+function plant(x,y){ R(x,y+6,6,5,'#7a3b1c'); R(x-1,y+1,8,5,'#1f9d62'); R(x+1,y-1,4,2,'#34d399'); }
+
+function drawRoom(){
+  R(0,0,LW,LH,'#07050f');
+  // arka duvar
+  R(0,0,LW,44,'#120c24');
+  for(let x=0;x<LW;x+=10) R(x,0,1,44,'#1a1236');
+  R(0,43,LW,2,'#2e2158');
+  // pencere (yıldızlı)
+  R(6,8,34,22,'#0a1030'); R(6,8,34,1,'#3b2a6b');
+  for(let i=0;i<9;i++){
+    const on=Math.sin(t*0.05+i*1.7)>0;
+    R(8+((i*13)%30),10+((i*7)%18),1,1,on?'#e9e6ff':'#4a4a78');
+  }
+  // grafik ekranı (duvar TV'si)
+  R(120,7,36,22,'#1b1338'); R(121,8,34,20,'#050a1c');
+  const amp=state.stats.tok>0?1:0.35;
+  for(let i=0;i<12;i++){
+    const h=Math.max(1,Math.round((Math.sin(t*0.08+i*0.8)*0.5+0.5)*15*amp+2));
+    R(123+Math.floor(i*2.8),27-h,2,h,i%2?'#34d399':'#22d3ee');
+  }
+  // sunucu rafı
+  R(176,6,18,36,'#0c0a1c');
+  for(let i=0;i<7;i++){
+    R(178,9+i*4,14,2,'#15102b');
+    const on=Math.floor(t/6+i)%3!==0;
+    R(179,10+i*4,1,1,on?'#34d399':'#ff2d95');
+    R(182,10+i*4,1,1,on?'#22d3ee':'#3b2a5c');
+  }
+  // zemin
+  R(0,45,LW,LH-45,'#0b0818');
+  for(let x=0;x<LW;x+=12) R(x,45,1,LH-45,'#17112e');
+  for(let y=50;y<LH;y+=10) R(0,y,LW,1,'#17112e');
+  plant(4,92); plant(190,92);
 }
-function glowDot(x,y,r,c,alpha=1){
-  const g=ctx.createRadialGradient(x,y,0,x,y,r*4);
-  g.addColorStop(0,c+'cc'); g.addColorStop(.35,c+'40'); g.addColorStop(1,c+'00');
-  ctx.globalAlpha=alpha; ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r*4,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x,y,r*.55,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha=1;
+
+function drawHub(){
+  const x=86,y=20;
+  R(x-6,y+18,40,4,'#4a1d4d'); R(x-6,y+18,40,1,'#7a2d7a');
+  R(x-4,y+22,3,10,'#2a1030'); R(x+30,y+22,3,10,'#2a1030');
+  R(x,y,28,16,'#2a0f2e'); R(x+1,y+1,26,14,'#14061c');
+  for(let i=0;i<26;i++){
+    const h=Math.round(2+Math.abs(Math.sin(t*0.12+i*0.5))*10);
+    R(x+1+i,y+15-h,1,h,'#ff2d95');
+  }
+  R(x+11,y+16,6,2,'#2a0f2e');
+  T('SEN',x+14,y+33,'#ff2d95',4.4);
+}
+
+function drawDesk(d,p,working){
+  const x=d.x,y=d.y,c=p.color;
+  // masa
+  R(x,y+14,44,4,'#3b2a5c'); R(x,y+14,44,1,'#5b4286');
+  R(x+2,y+18,3,14,'#241a3a'); R(x+39,y+18,3,14,'#241a3a');
+  // monitör
+  R(x+12,y,18,13,'#1a1430');
+  R(x+13,y+1,16,10,working?'#0c1f2a':'#0a0e1e');
+  for(let k=0;k<4;k++){
+    const w=working?4+Math.round((Math.sin(t*0.25+k*1.3)+1)*4):3+k*2;
+    R(x+14,y+2+k*2,Math.min(w,14),1,working?c:c+'55');
+  }
+  R(x+19,y+13,4,2,'#1a1430');
+  // karakter
+  const bob=working?Math.round(Math.sin(t*0.3)):0;
+  R(x+33,y+22,8,5,'#2a2150');
+  R(x+34,y+15+bob,7,8,c);
+  R(x+34,y+9+bob,7,6,'#f2c9a0');
+  R(x+34,y+8+bob,7,2,'#1a1430');
+  const eye=working?'#ffffff':'#000000';
+  R(x+36,y+12+bob,1,1,eye); R(x+39,y+12+bob,1,1,eye);
+  // durum ışığı
+  const led=working?(Math.floor(t/8)%2?'#fbbf24':'#3b2a1a'):'#34d399';
+  R(x+41,y-3,2,2,led);
+  T(p.name.toUpperCase(),x+22,y+38,c,4.2);
+}
+
+function drawLinks(){
+  provC.forEach((q,i)=>{
+    ctx.strokeStyle=PROVIDERS[i].color+'40';
+    ctx.lineWidth=Math.max(1,sc*0.6);
+    ctx.setLineDash([2*sc,3*sc]); ctx.lineDashOffset=-t*0.6*sc;
+    ctx.beginPath(); ctx.moveTo(sx(hubC.x),sy(hubC.y)); ctx.lineTo(sx(q.x),sy(q.y)); ctx.stroke();
+    ctx.setLineDash([]);
+  });
+}
+
+function drawPacket(x,y,c){
+  ctx.shadowColor=c; ctx.shadowBlur=10;
+  ctx.fillStyle='#ffffff'; ctx.fillRect(sx(x)-sc*0.5,sy(y)-sc*0.5,sc,sc);
+  ctx.fillStyle=c; ctx.fillRect(sx(x)-sc,sy(y)-sc,sc*2,sc*2);
+  ctx.shadowBlur=0;
 }
 
 function drawNet(){
   t++;
-  ctx.clearRect(0,0,W,H);
-
-  // yıldızlar
-  stars.forEach(s=>{
-    const a=.25+.35*Math.sin(t*0.03+s.ph);
-    ctx.fillStyle=`rgba(220,210,255,${a})`; ctx.fillRect(s.x,s.y,s.s,s.s);
-  });
-
-  // uydular (sürüklenen küçük düğümler)
-  sats.forEach(s=>{
-    s.x+=s.vx; s.y+=s.vy;
-    if(s.x<0||s.x>W) s.vx*=-1; if(s.y<0||s.y>H) s.vy*=-1;
-    const a=.35+.35*Math.sin(t*0.05+s.ph);
-    ctx.globalAlpha=a; ctx.fillStyle=s.c; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha=1;
-  });
-
-  // ana bağlantılar (kesik çizgi akışı)
-  const pos=provNodes.map(provPos);
-  pos.forEach((q,i)=>{
-    const c=PROVIDERS[i].color;
-    const b=bez(hub,q,.5);
-    ctx.setLineDash([3,6]); ctx.lineDashOffset=-t*0.8;
-    ctx.strokeStyle=c+'66'; ctx.lineWidth=1.2;
-    ctx.beginPath(); ctx.moveTo(hub.x,hub.y); ctx.quadraticCurveTo(b.cx,b.cy,q.x,q.y); ctx.stroke();
-    ctx.setLineDash([]);
-  });
-  // sağlayıcılar arası ince ağ
-  for(let i=0;i<pos.length;i++){
-    const j=(i+1)%pos.length;
-    ctx.strokeStyle='rgba(167,139,250,.14)'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(pos[i].x,pos[i].y); ctx.lineTo(pos[j].x,pos[j].y); ctx.stroke();
-  }
-
-  // ana hub (SEN) nabız
-  const pulse=1+.12*Math.sin(t*0.08);
-  const hg=ctx.createRadialGradient(hub.x,hub.y,0,hub.x,hub.y,46*pulse);
-  hg.addColorStop(0,'rgba(255,45,149,.55)'); hg.addColorStop(1,'rgba(255,45,149,0)');
-  ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(hub.x,hub.y,46*pulse,0,Math.PI*2); ctx.fill();
-  glowDot(hub.x,hub.y,9,'#ff2d95');
-  ctx.fillStyle='#eee9ff'; ctx.font='bold 10px system-ui'; ctx.textAlign='center';
-  ctx.fillText('SEN',hub.x,hub.y+24);
-
-  // sağlayıcı düğümleri
-  provNodes.forEach((n,i)=>{
-    const q=pos[i], c=n.p.color;
-    if(busy[n.p.id]){
-      const rr=(t*1.6)%60;
-      ctx.strokeStyle=c; ctx.globalAlpha=1-rr/60; ctx.lineWidth=1.5;
-      ctx.beginPath(); ctx.arc(q.x,q.y,12+rr,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
-    }
-    glowDot(q.x,q.y,7,c, state.keys[n.p.id]?1:.35);
-    ctx.fillStyle=c; ctx.font='bold 10px system-ui'; ctx.textAlign='center';
-    ctx.fillText(n.p.name.toUpperCase(),q.x,q.y+22);
-  });
-
-  // paketler (istek ve yanıt)
+  drawRoom();
+  drawLinks();
+  drawHub();
+  PROVIDERS.forEach((p,i)=>drawDesk(DESKS[i],p,!!busy[p.id]));
   packets=packets.filter(p=>{
-    p.k+=p.sp; if(p.k>=1){ if(p.onArrive) p.onArrive(); return false; }
-    const a=p.from==='hub'?hub:pos[p.idx];
-    const b=p.from==='hub'?pos[p.idx]:hub;
-    const q=bez(a,b,p.k);
-    glowDot(q.x,q.y,2.2,p.c);
+    p.k+=p.sp;
+    if(p.k>=1){ if(p.onArrive) p.onArrive(); return false; }
+    const a=p.from==='hub'?hubC:provC[p.idx], b=p.from==='hub'?provC[p.idx]:hubC;
+    drawPacket(a.x+(b.x-a.x)*p.k, a.y+(b.y-a.y)*p.k, p.c);
     return true;
   });
-
-  // dalgalar
-  rings=rings.filter(r=>{ r.age+=1; if(r.age>40) return false;
-    ctx.globalAlpha=1-r.age/40; ctx.strokeStyle=r.c; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.arc(r.x,r.y,r.age*2.5,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1; return true; });
-
+  rings=rings.filter(r=>{
+    r.age++; if(r.age>40) return false;
+    ctx.globalAlpha=1-r.age/40; ctx.strokeStyle=r.c; ctx.lineWidth=Math.max(1,sc);
+    ctx.beginPath(); ctx.arc(sx(r.x),sy(r.y),r.age*sc*0.8,0,Math.PI*2); ctx.stroke();
+    ctx.globalAlpha=1; return true;
+  });
   requestAnimationFrame(drawNet);
 }
 
 function sendPacket(idx){
-  const c=PROVIDERS[idx].color;
-  packets.push({from:'hub',idx,k:0,sp:.012+Math.random()*.004,c});
+  packets.push({from:'hub',idx,k:0,sp:.012+Math.random()*.004,c:PROVIDERS[idx].color});
 }
 function returnPacket(idx,onArrive){
-  const c=PROVIDERS[idx].color;
-  packets.push({from:'prov',idx,k:0,sp:.02,c,onArrive});
+  packets.push({from:'prov',idx,k:0,sp:.02,c:PROVIDERS[idx].color,onArrive});
 }
 
 /* ============ TOKEN GRAFİĞİ ============ */
@@ -547,7 +571,7 @@ async function askOne(p,prompt,bubble){
     lat[p.id].push(ms); if(lat[p.id].length>40) lat[p.id].shift();
     state.stats.req++; state.stats.tok+=r.tok; tokHist.push(state.stats.tok);
     log('ok',`✓ ${p.name} · ${ms} ms · ${r.tok} token`);
-    returnPacket(PROVIDERS.indexOf(p),()=>rings.push({x:hub.x,y:hub.y,age:0,c:p.color}));
+    returnPacket(PROVIDERS.indexOf(p),()=>rings.push({x:hubC.x,y:hubC.y,age:0,c:p.color}));
     fillBubble(bubble,p,{ok:true,text:r.text,model:r.model,ms});
     return {ok:true,ms};
   }catch(e){
