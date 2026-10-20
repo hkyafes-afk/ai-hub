@@ -1,0 +1,9 @@
+{
+  "name": "AI Hub",
+  "short_name": "AI Hub",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07060d",
+  "theme_color": "#07060d",
+  "icons": []
+}
