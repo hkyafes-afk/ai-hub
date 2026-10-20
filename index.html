@@ -178,6 +178,13 @@
     .pair{display:none}
     .a-spark,.a-row{display:none}
     .agent{padding:6px 8px}
+    .agents{display:flex;overflow-x:auto;scrollbar-width:none}
+    .clock{display:none}
+    .brand small{display:none}
+    .brand h1{font-size:15px}
+    .btn{padding:7px 9px;font-size:12px}
+    .hright{gap:6px}
+    .agent{flex:none;width:130px}
     .agents{gap:6px;padding:10px 10px 4px}
     .agent{padding:8px}
     .agent select{font-size:10px}
@@ -274,7 +281,15 @@ const PROVIDERS = [
   { id:'openrouter', name:'OpenRouter', glyph:'◈', color:'#a78bfa', role:'ÇEŞİTLİ',
     base:'https://openrouter.ai/api/v1', keyUrl:'https://openrouter.ai/keys',
     models:['minimax/minimax-m3.1-flash:free','nvidia/nemotron-3.5-super-vl:free'],
-    limit:'ücretsiz modeller · 50/gün' }
+    limit:'ücretsiz modeller · 50/gün' },
+  { id:'nvidia', name:'NVIDIA', glyph:'▣', color:'#76b900', role:'NIM',
+    base:'https://integrate.api.nvidia.com/v1', keyUrl:'https://build.nvidia.com/settings/api-keys',
+    models:['deepseek-ai/deepseek-v3.1','meta/llama-3.1-70b-instruct','moonshotai/kimi-k2'],
+    limit:'~1000 ücretsiz kredi · 40/dk' },
+  { id:'mistral', name:'Mistral', glyph:'≋', color:'#ff7000', role:'AVRUPA',
+    base:'https://api.mistral.ai/v1', keyUrl:'https://console.mistral.ai/api-keys',
+    models:['mistral-small-latest','mistral-large-latest'],
+    limit:'Experiment planı · telefon doğrulama' }
 ];
 
 /* ============ DURUM ============ */
@@ -498,7 +513,7 @@ function drawNet(){
   drawRoom();
   drawLinks();
   drawHub();
-  PROVIDERS.forEach((p,i)=>drawDesk(DESKS[i],p,!!busy[p.id]));
+  PROVIDERS.slice(0,DESKS.length).forEach((p,i)=>drawDesk(DESKS[i],p,!!busy[p.id]));
   packets=packets.filter(p=>{
     p.k+=p.sp;
     if(p.k>=1){ if(p.onArrive) p.onArrive(); return false; }
@@ -516,9 +531,11 @@ function drawNet(){
 }
 
 function sendPacket(idx){
+  if(idx>=DESKS.length) return;
   packets.push({from:'hub',idx,k:0,sp:.012+Math.random()*.004,c:PROVIDERS[idx].color});
 }
 function returnPacket(idx,onArrive){
+  if(idx>=DESKS.length) return;
   packets.push({from:'prov',idx,k:0,sp:.02,c:PROVIDERS[idx].color,onArrive});
 }
 
