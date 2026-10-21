@@ -322,6 +322,15 @@ textarea.inp{height:auto;min-height:76px;padding:10px 12px;line-height:1.45;resi
 .spin .ic{animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+.xmodal{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%);width:min(440px,calc(100vw - 28px));z-index:23;background:#0d0b1d;border:1px solid var(--line2);border-radius:20px;padding:14px;display:none;flex-direction:column;gap:10px;box-shadow:0 30px 60px -20px #000}
+.xmodal.show{display:flex}
+.xm-head{display:flex;align-items:center;justify-content:space-between}
+.xm-head b{font-size:16px}
+.xm-text{min-height:120px;height:auto}
+.xm-foot{display:flex;align-items:center;justify-content:space-between}
+.xm-count{font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.xm-status{font-size:13px;min-height:18px;line-height:1.45;word-break:break-word}
+.xm-status a{color:#7dd3fc}
 .toast{position:fixed;left:50%;bottom:calc(130px + env(safe-area-inset-bottom));transform:translate(-50%,16px);max-width:90vw;z-index:40;
   background:#221d44;border:1px solid var(--line2);color:var(--text);padding:10px 16px;border-radius:12px;font-size:13.5px;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 12px 30px -10px #000}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -413,6 +422,14 @@ textarea.inp{height:auto;min-height:76px;padding:10px 12px;line-height:1.45;resi
   <div class="grab"></div>
   <div class="sheet-head"><h3>Ayarlar</h3><button class="icon-btn" id="sheetClose" aria-label="Kapat"></button></div>
   <div class="sheet-body" id="sheetBody"></div>
+</div>
+
+<div class="xmodal" id="xModal" role="dialog" aria-label="X'te paylaş">
+  <div class="xm-head"><b>X'te paylaş</b><button class="icon-btn sm" id="xClose" aria-label="Kapat"></button></div>
+  <textarea id="xText" class="inp xm-text" rows="5" placeholder="Paylaşılacak metin"></textarea>
+  <div class="xm-foot"><span class="xm-count" id="xCount">0/280</span><button class="btn primary" id="xSend">Paylaş</button></div>
+  <div class="xm-status" id="xStatus"></div>
+  <div class="hint">Taslağı düzenleyebilirsin. Paylaş'a basmadan hiçbir şey gönderilmez.</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -575,7 +592,7 @@ function loadState(){
   }
   s.keys=s.keys||{}; s.models=s.models||{}; s.modelLists=s.modelLists||{}; s.modelFetchedAt=s.modelFetchedAt||{};
   s.convs=Array.isArray(s.convs)?s.convs:[]; s.currentId=s.currentId||null;
-  s.settings=Object.assign({target:'auto',task:'genel',len:'normal',persona:'',stageCollapsed:false,autoSpeak:false,mode:'sohbet',agents:12,judge:'auto',heal:false},s.settings||{});
+  s.settings=Object.assign({target:'auto',task:'genel',len:'normal',persona:'',stageCollapsed:false,autoSpeak:false,mode:'sohbet',agents:12,judge:'auto',heal:false,xUrl:'',xPass:''},s.settings||{});
   s.usage=s.usage||{date:today(),counts:{}};
   s.recent=Array.isArray(s.recent)?s.recent.filter(r=>r.ok!==null):[];
   s.stats=s.stats||{req:0,tok:0,err:0};
@@ -1320,7 +1337,7 @@ function cardHTML(m,{root,last,inCmp}){
   let actions='';
   if(!m.pending){
     const a=[];
-    if(m.text&&!m.error){ a.push(actBtn('copy','Kopyala',m.id,'copy')); a.push(actBtn('speak','Dinle',m.id,'volume')); if(navigator.share) a.push(actBtn('share','Paylaş',m.id,'share')); }
+    if(m.text&&!m.error){ a.push(actBtn('copy','Kopyala',m.id,'copy')); a.push(actBtn('speak','Dinle',m.id,'volume')); if(navigator.share) a.push(actBtn('share','Paylaş',m.id,'share')); a.push(actBtn('xpost','X\'te paylaş',m.id,'ext')); }
     if(!inCmp&&last&&!busy) a.push(actBtn(m.error?'retry':'regen',m.error?'Tekrar dene':'Yeniden',root,'refresh'));
     if(m.error&&m.errorKind==='auth') a.push(actBtn('settings','Ayarlar',m.id,'sliders'));
     if(a.length) actions=`<div class="ai-actions">${a.join('')}</div>`;
@@ -1478,6 +1495,7 @@ chat.addEventListener('click',e=>{
   if(act==='copy') copyText(msgText(f.msg),b);
   else if(act==='speak') speak(msgText(f.msg));
   else if(act==='share') shareText(msgText(f.msg));
+  else if(act==='xpost') openX(msgText(f.msg));
   else if(act==='replay'){ setView('company'); setMax(true); coReplay(f.msg); }
   else if(act==='map'){ live.co=coBuild(f.msg); f.msg.events.forEach(ev=>coEvent(ev,false)); setView('company'); setMax(true); }
   else if(act==='band'){ live.pl=f.msg; live.plMove=null; setView('pipeline'); if(state.settings.stageCollapsed){ state.settings.stageCollapsed=false; applyStage(); } $('#stage').scrollIntoView?.({block:'nearest'}); }
@@ -1585,7 +1603,7 @@ function openDrawer(){ renderDrawer(); $('#drawer').classList.add('show'); scrim
 function closeDrawer(){ $('#drawer').classList.remove('show'); if(!$('#sheet').classList.contains('show')) scrim.classList.remove('show'); }
 function openSheet(){ renderSheet(); $('#sheet').classList.add('show'); scrim.classList.add('show'); }
 function closeSheet(){ $('#sheet').classList.remove('show'); if(!$('#drawer').classList.contains('show')) scrim.classList.remove('show'); renderTools(); renderHeader(); const c=currentConv(); if(!c||!c.msgs.length) renderChat(); }
-scrim.addEventListener('click',()=>{ closeDrawer(); closeSheet(); });
+scrim.addEventListener('click',()=>{ closeDrawer(); closeSheet(); closeX(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeDrawer(); closeSheet(); if($('#app').classList.contains('stage-max')) setMax(false); } });
 let toastT=0;
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2800); }
@@ -1634,6 +1652,13 @@ function renderSheet(){
       <label class="switch"><span>İstemi otomatik iyileştir (+1 istek)</span><input type="checkbox" id="healSw" ${s.heal?'checked':''}></label>
       <label class="switch"><span>Cevapları otomatik sesli oku</span><input type="checkbox" id="autoSpeak" ${s.autoSpeak?'checked':''}></label>
     </div>
+    <div class="sec"><h4>X (Twitter) paylaşımı</h4>
+      <label class="field"><span>Worker adresi</span><input class="inp" data-x="xUrl" value="${esc(s.xUrl||'')}" placeholder="https://aihub-x.xxx.workers.dev" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <label class="field"><span>Parola</span><input class="inp" type="password" data-x="xPass" value="${esc(s.xPass||'')}" placeholder="Worker'a koyduğun PASSWORD" autocomplete="off"></label>
+      <div class="btn-row"><button class="btn" data-act="xtest">${ic('share')} Test tweet at</button></div>
+      <div class="test" id="xTestOut"></div>
+      <div class="hint">X anahtarları bu uygulamada değil, Cloudflare'deki Worker'da tutulur. Burada yalnızca adres ve parola var.</div>
+    </div>
     <div class="sec"><h4>Veri</h4>
       <div class="btn-row"><button class="btn" data-act="export">${ic('download')} Bu sohbeti indir</button><button class="btn danger" data-act="wipe">${ic('trash')} Tüm sohbetleri sil</button></div>
     </div>
@@ -1645,6 +1670,7 @@ sheetBody.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.key){ const v=t.value.trim(); if(v) state.keys[t.dataset.key]=v; else delete state.keys[t.dataset.key]; saveSoon(); }
   else if(t.id==='persona'){ state.settings.persona=t.value; saveSoon(); }
+  else if(t.dataset.x){ state.settings[t.dataset.x]=t.value.trim(); saveSoon(); }
 });
 sheetBody.addEventListener('change',e=>{
   const t=e.target;
@@ -1661,6 +1687,7 @@ sheetBody.addEventListener('click',async e=>{
   else if(act==='models'){ b.classList.add('spin'); await refreshModels(p); b.classList.remove('spin'); }
   else if(act==='test') testProvider(p);
   else if(act==='export') exportConv();
+  else if(act==='xtest') xTest();
   else if(act==='wipe'){
     if(!b.classList.contains('armed')){ b.classList.add('armed'); b.lastChild.textContent=' Emin misin? Tekrar dokun'; setTimeout(()=>{ if(b.isConnected){ b.classList.remove('armed'); b.lastChild.textContent=' Tüm sohbetleri sil'; } },3000); return; }
     if(busy) stopAll();
@@ -1679,6 +1706,44 @@ async function testProvider(p){
   const html=r.ok?`<span class="good">✓ Çalışıyor · ${fmtMs(m.ms)} · ${esc(m.model)}</span>`:`<span class="bad">${esc(m.error||'Başarısız')}</span>`;
   refreshProvCard(p.id); const o2=$('#test-'+p.id); if(o2) o2.innerHTML=html;
 }
+/* ---------- X'te paylaşım (Worker üzerinden; anahtarlar sunucuda) ---------- */
+function openX(text){
+  if(!state.settings.xUrl||!state.settings.xPass){ toast("Önce Ayarlar'dan X Worker adresini ve parolayı gir"); openSheet(); return; }
+  const ta=$('#xText'); ta.value=plain(text).slice(0,280); xCount();
+  $('#xStatus').textContent=''; $('#xModal').classList.add('show'); scrim.classList.add('show');
+  setTimeout(()=>ta.focus(),50);
+}
+function closeX(){ $('#xModal').classList.remove('show'); if(!$('#sheet').classList.contains('show')&&!$('#drawer').classList.contains('show')) scrim.classList.remove('show'); }
+function xCount(){ const n=[...$('#xText').value].length; const c=$('#xCount'); c.textContent=`${n}/280`; c.style.color=n>280?'var(--err)':''; $('#xSend').disabled=n===0||n>280; }
+async function xPost(text){
+  const r=await fetch(`${state.settings.xUrl}?k=${encodeURIComponent(state.settings.xPass)}&t=${encodeURIComponent(text)}`);
+  let j={}; try{ j=await r.json(); }catch{}
+  if(!r.ok||!j.ok) throw new Error(j.hint?`${j.error||'hata'} — ${j.hint}`:(j.error||`Hata (HTTP ${r.status})`));
+  return j;
+}
+async function xSendFromModal(){
+  const text=$('#xText').value.trim(), st=$('#xStatus');
+  $('#xSend').disabled=true; st.textContent='Paylaşılıyor…';
+  try{
+    const j=await xPost(text);
+    st.innerHTML=`<span class="good">✓ Paylaşıldı</span> · <a href="${esc(j.url)}" target="_blank" rel="noopener">Tweet'i aç</a>`;
+    toast("X'te paylaşıldı");
+  }catch(e){ st.innerHTML=`<span class="bad">${esc(e.message)}</span>`; $('#xSend').disabled=false; }
+}
+async function xTest(){
+  const out=$('#xTestOut');
+  if(!state.settings.xUrl||!state.settings.xPass){ out.innerHTML='<span class="bad">Adres ve parolayı gir.</span>'; return; }
+  out.innerHTML='<span class="muted">Deneniyor…</span>';
+  try{
+    const j=await xPost(`AI Hub test paylaşımı · ${new Date().toLocaleTimeString('tr-TR')}`);
+    out.innerHTML=`<span class="good">✓ Çalışıyor</span> · <a href="${esc(j.url)}" target="_blank" rel="noopener">Tweet'i aç</a>`;
+  }catch(e){ out.innerHTML=`<span class="bad">${esc(e.message)}</span>`; }
+}
+$('#xClose').innerHTML=ic('x');
+$('#xClose').addEventListener('click',closeX);
+$('#xText').addEventListener('input',xCount);
+$('#xSend').addEventListener('click',xSendFromModal);
+
 function exportConv(){
   const c=currentConv();
   if(!c||!c.msgs.length){ toast('İndirilecek sohbet yok'); return; }
